@@ -1,0 +1,10 @@
+{
+    "config": {
+        "platform": {
+            "php": "5.4.16"
+        }
+    },
+    "require": {
+        "phpmailer/phpmailer": "^5.2"
+    }
+}
