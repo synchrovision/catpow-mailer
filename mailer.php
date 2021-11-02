@@ -20,6 +20,7 @@ $res=new Catpow\REST_Response();
 ob_start();
 $action=preg_replace('/\W/','',$_POST['action']);
 try{
+	$form->verify_nonce();
 	$f=FORM_DIR.'/form/'.$action.'.php';
 	if(!file_exists($f)){throw new Exception('Forbidden',403);}
 	Catpow\util\I18n::setup(isset($form->config['locale'])?$form->config['locale']:'ja_JP');
