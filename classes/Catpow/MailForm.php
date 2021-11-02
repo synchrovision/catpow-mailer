@@ -131,6 +131,9 @@ class MailForm{
 		$this->values=[];
 		$this->received=[];
 	}
+	public function verify_nonce(){
+		if($this->nonce!==$_SERVER['HTTP_X_CMF_NONCE']){throw new \Exception('Forbidden',403);};
+	}
 	public function refresh(){
 		$this->nonce=bin2hex(openssl_random_pseudo_bytes(8));
 		$this->expire=strtotime(isset($this->config['expire'])?$this->config['expire']:'+ 1 hour');
