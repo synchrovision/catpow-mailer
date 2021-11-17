@@ -1,4 +1,4 @@
-/* global console gtag Catpow*/
+/* global console gtag ga Catpow*/
 window.Catpow=window.Catpow || {};
 
 Catpow.MailFormUrl=document.scripts[document.scripts.length-1].src;
@@ -16,6 +16,10 @@ Catpow.MailForm=function(form){
 		var bnd=form.getBoundingClientRect();
 		window.scrollBy({top:bnd.top-100,behavior:'smooth'});
 	}
+	cmf.focusAlert=function(){
+		var bnd=form.querySelector('.cmf-input.is-error').getBoundingClientRect();
+		window.scrollBy({top:bnd.top-200,behavior:'smooth'});
+	}
 	cmf.send=function(data,focus=true){
 		var xhr=new XMLHttpRequest();
 		xhr.responseType='text';
@@ -27,7 +31,7 @@ Catpow.MailForm=function(form){
 						if(key==='@form'){cmf.alert(res.error[key]);}
 						else{cmf.inputs[key].alert(res.error[key]);}
 					});
-					cmf.focus();
+					cmf.focusAlert();
 					return;
 				}
 				if(res.html){
@@ -35,11 +39,14 @@ Catpow.MailForm=function(form){
 					cmf.reset();
 					if(focus){cmf.focus();}
 				}
-				if(res.uri){
+				if(focus && res.uri){
 					history.pushState(res,null,res.uri);
 					if(window.gtag){
 						gtag('set','page_path',res.uri);
 						gtag('event','page_view');
+					}
+					if(window.ga){
+						ga('send','pageview',res.uri);
 					}
 				}
 			}
