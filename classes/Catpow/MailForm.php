@@ -3,7 +3,7 @@ namespace Catpow;
 use PHPMailer;
 
 class MailForm{
-	public $nonce,$created,$expire,$inputs=[],$allowed_actions=[],$allowed_inputs=[],$config,$values=[],$received=[],$errors=[];
+	public $nonce,$created,$expire,$inputs=[],$allowed_actions=[],$allowed_inputs=[],$agreements=[],$config,$values=[],$received=[],$errors=[];
 	public function __construct(){
 		include \FORM_DIR.'/config.php';
 		$this->config=$config;
@@ -28,7 +28,7 @@ class MailForm{
 	
 	public function input($name){
 		$this->allow_input($name);
-		return sprintf('<div class="cmf-input" data-input="%s">%s</div>',$name,$this->inputs[$name]->input());
+		return sprintf('<div class="cmf-input cmf-input_%s" data-input="%s">%s</div>',$this->inputs[$name]->type,$name,$this->inputs[$name]->input());
 	}
 	public function output($name){
 		if(isset($this->values[$name])){return $this->values[$name];}
@@ -53,14 +53,28 @@ class MailForm{
 		
 	}
 	
+	public function agreement($label,$conf=null){
+		$conf=isset($conf)?$conf:[];
+		$conf['type']='checkbox';
+		$conf['value']=[$label];
+		$name=isset($conf['name'])?$conf['name']:'agreement';
+		$this->agreements[$name]=$conf;
+		$input=new input\checkbox($name,$conf,$this);
+		return sprintf('<div class="cmf-input cmf-input_%s" data-input="%s">%s</div>',$input->type,$name,$input->input());
+	}
 	public function receive($post=null){
+		$post=isset($post)?$post:$_POST;
 		$this->errors=[];
+		if(!empty($this->agreements)){
+			foreach($this->agreements as $key=>$conf){
+				if(empty($post[$key])){
+					$this->errors[$key]=validation\agreement::get_message($conf);
+				}
+			}
+		}
 		$this->received=array_merge(
 			$this->allowed_inputs,
-			array_intersect_key(
-				isset($post)?$post:$_POST,
-				$this->allowed_inputs
-			)
+			array_intersect_key($post,$this->allowed_inputs)
 		);
 		foreach($this->received as $key=>$val){
 			$input=$this->inputs[$key];
@@ -123,6 +137,7 @@ class MailForm{
 	}
 	
 	public function clear(){
+		$this->agreements=[];
 		$this->allowed_actions=[];
 		$this->allowed_inputs=[];
 	}
