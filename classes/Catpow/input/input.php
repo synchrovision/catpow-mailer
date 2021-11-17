@@ -33,7 +33,7 @@ abstract class input{
 				if(isset($this->form->reserved[$this->name]))return $this->form->reserved[$this->name];
 				if(isset($this->form->values[$this->name]))return $this->form->values[$this->name];
 				return '';
-			case 'required':return !empty($this->conf['required']) || substr($this->conf['label'],-1)==='*';
+			case 'required':return !empty($this->conf['required']) || substr($this->label,-1)==='*';
 			case 'validation':return isset($this->conf['validation'])?$this->conf['validation']:static::$validation;
 			case 'attr':{
 				$attr='';
