@@ -66,15 +66,32 @@ Catpow.MailForm=function(form){
 	};
 	cmf.reset=function(){
 		cmf.inputs={};
+		cmf.sealedButtons=[];
+		cmf.agreementCheckboxes=[];
+		cmf.agreed=false;
 		Array.prototype.forEach.call(form.querySelectorAll('.cmf-input'),function(input){
 			cmf.inputs[input.dataset.input]=new Catpow.MailFormInput(input);
+			if(input.classList.contains('cmf-agreement')){
+				var checkbox=input.querySelector('input[type="checkbox"]');
+				checkbox.addEventListener('change',cmf.updateState);
+				cmf.agreementCheckboxes.push(checkbox);
+			}
 		});
 		Array.prototype.forEach.call(form.querySelectorAll('.cmf-button'),function(button){
+			if(button.classList.contains('sealed')){cmf.sealedButtons.push(button);}
 			button.addEventListener('click',function(){
+				if(button.classList.contains('disabled')){return;}
 				var fd=new FormData(form);
 				fd.append('action',button.dataset.action);
 				cmf.send(fd);
 			});
+		});
+		cmf.updateState();
+	};
+	cmf.updateState=function(){
+		cmf.agreed=cmf.agreementCheckboxes.every(function(checkbox){return checkbox.checked;});
+		cmf.sealedButtons.map(function(button){
+			button.classList[cmf.agreed?'remove':'add']('disabled');
 		});
 	};
 	cmf.init=function(){
@@ -98,11 +115,11 @@ Catpow.MailFormInput=function(input){
 			input.insertBefore(alert,input.firstChild);
 		}
 		alert.innerHTML=text;
-		input.className='cmf-input is-error';
-	}
+		input.classList.add('is-error');
+	};
 	this.hideAlert=function(){
-		input.className='cmf-input';
-	}
+		input.classList.remove('is-error');
+	};
 	input.addEventListener('change',this.hideAlert);
 	return this;
 }

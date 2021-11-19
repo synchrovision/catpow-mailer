@@ -60,7 +60,7 @@ class MailForm{
 		$name=isset($conf['name'])?$conf['name']:'agreement';
 		$this->agreements[$name]=$conf;
 		$input=new input\checkbox($name,$conf,$this);
-		return sprintf('<div class="cmf-input cmf-input_%s" data-input="%s">%s</div>',$input->type,$name,$input->input());
+		return sprintf('<div class="cmf-input cmf-input_%s cmf-agreement" data-input="%s">%s</div>',$input->type,$name,$input->input());
 	}
 	public function receive($post=null){
 		$post=isset($post)?$post:$_POST;
