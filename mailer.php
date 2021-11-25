@@ -1,7 +1,9 @@
 <?php
 require_once(__DIR__.'/vendor/autoload.php');
 define('MAILER_DIR',__DIR__);
+define('MAILER_URI',dirname($_SERVER['REQUEST_URI']));
 define('FORM_DIR',dirname(__DIR__));
+define('FORM_URI',dirname(MAILER_URI));
 spl_autoload_register(function($class){
 	$path=str_replace('\\','/',$class);
 	if(file_exists($f=FORM_DIR.'/classes/'.$path.'.php')){include($f);}
@@ -14,6 +16,7 @@ if($_SERVER['REQUEST_METHOD']=='GET'){
 	header("Content-Type: text/javascript; charset=utf-8");
 	readfile(MAILER_DIR.'/js/script.js');
 	printf("\nCatpow.MailFormNonce=\"%s\";\n",$form->nonce);
+	$form->render_ui_loader_script();
 	die();
 }
 $res=new Catpow\REST_Response();
