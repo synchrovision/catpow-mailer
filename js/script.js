@@ -1,5 +1,7 @@
-/* global console gtag ga Catpow*/
+/* global console gtag ga Catpow ReactDOM React*/
 window.Catpow=window.Catpow || {};
+Catpow.Components=Catpow.Components || {};
+Catpow.UI=Catpow.UI || {};
 
 Catpow.MailFormUrl=document.scripts[document.scripts.length-1].src;
 Catpow.MailForm=function(form){
@@ -77,6 +79,9 @@ Catpow.MailForm=function(form){
 				cmf.agreementCheckboxes.push(checkbox);
 			}
 		});
+		Array.prototype.forEach.call(form.querySelectorAll('.cmf-ui'),function(ui){
+			ReactDOM.render(React.createElement(Catpow.UI[ui.dataset.ui],JSON.parse(ui.textContent)),ui);
+		});
 		Array.prototype.forEach.call(form.querySelectorAll('.cmf-button'),function(button){
 			if(button.classList.contains('sealed')){cmf.sealedButtons.push(button);}
 			button.addEventListener('click',function(){
@@ -105,6 +110,19 @@ Catpow.MailForm=function(form){
 	cmf.init();
 	return cmf;
 }
+Catpow.MailForm.loadScript=function(src,cb){
+	var el=document.createElement('script');
+	el.setAttribute('type','text/javascript');
+	el.setAttribute('src',src);
+	document.body.appendChild(el);
+	if(cb){el.onload=cb;}
+}
+Catpow.MailForm.loadStyle=function(href){
+	var el=document.createElement('link');
+	el.setAttribute('rel','stylesheet');
+	el.setAttribute('href',href);
+	document.head.appendChild(el);
+}
 Catpow.MailFormInput=function(input){
 	this.el=input;
 	this.alert=function(text){
@@ -125,5 +143,14 @@ Catpow.MailFormInput=function(input){
 }
 
 window.addEventListener('DOMContentLoaded',function(){
-	Array.prototype.forEach.call(document.querySelectorAll('form.cmf-form'),Catpow.MailForm);
+	if(!Catpow.MailForm.requireReact || 'React' in window){
+		Array.prototype.forEach.call(document.querySelectorAll('form.cmf-form'),Catpow.MailForm);
+	}
+	else{
+		Catpow.MailForm.loadScript('https://unpkg.com/react@17/umd/react.production.min.js',function(){
+			Catpow.MailForm.loadScript('https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',function(){
+				Array.prototype.forEach.call(document.querySelectorAll('form.cmf-form'),Catpow.MailForm);
+			});
+		});
+	}
 });
