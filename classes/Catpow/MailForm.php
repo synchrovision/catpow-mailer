@@ -49,8 +49,7 @@ class MailForm{
 		$this->allowed_actions[$action]='';
 	}
 	public function is_allowed_action($action){
-		return !isset($this->allowed_actions[$action]);
-		
+		return isset($this->allowed_actions[$action]);
 	}
 	
 	public function agreement($label,$conf=null){
@@ -192,10 +191,66 @@ class MailForm{
 	}
 	public static function get_json($name){
 		$path='/json/'.$name.'.json';
-		if(file_exists($f=\FORM_DIR.$path) || file_exists($f=MAILER_DIR.$path)){
+		if(file_exists($f=\FORM_DIR.$path) || file_exists($f=\MAILER_DIR.$path)){
 			return json_decode(file_get_contents($f),true);
 		}
 		return [];
+	}
+	
+	public function render_ui_loader_script(){
+		$deps=[];
+		foreach($this->inputs as $input){
+			if(is_null($input->ui)){continue;}
+			$deps=array_merge_recursive(static::get_deps('/ui/'.$input->ui),$deps);
+		}
+		foreach(array_keys($deps['script']) as $script){
+			echo "Catpow.MailForm.loadScript('{$script}');\n";
+		}
+		foreach(array_keys($deps['style']) as $style){
+			echo "Catpow.MailForm.loadStyle('{$style}');\n";
+		}
+		printf("Catpow.MailForm.requireReact=%s;\n",empty($deps)?'false':'true');
+	}
+	public static function get_deps($path){
+		$deps=[];
+		foreach(['script'=>'/component.js','style'=>'/style.css'] as $type=>$fname){
+			foreach([\FORM_DIR=>\FORM_URI,\MAILER_DIR=>\MAILER_URI] as $dir=>$uri){
+				if(self::file_should_exists($dir.$path.$fname)){
+					$deps[$type][$uri.$path.$fname]=true;
+					break;
+				}
+			}
+		}
+		if(self::file_should_exists(\FORM_DIR.$path.'/style.css')){
+			$deps['style'][\FORM_URI.$path.'/style.css']=true;
+		}
+		elseif(self::file_should_exists(\MAILER_DIR.$path.'/style.css')){
+			$deps['style'][\MAILER_URI.$path.'/style.css']=true;
+		}
+		if(file_exists($f=\FORM_DIR.$path.'/deps.php') || file_exists($f=\MAILER_DIR.$path.'/deps.php')){
+			include $f;
+			if(!empty($useComponents)){
+				foreach($useComponents as $useComponent){
+					$deps=array_merge_recursive(self::get_deps('/components/'.$useComponent),$deps);
+				}
+			}
+		}
+		return $deps;
+	}
+	public static function file_should_exists($file){
+		if(file_exists($file)){return true;}
+		switch(strrchr($file,'.')){
+			case '.js':
+				if(file_exists($file.'x')){return true;}
+				return false;
+			case '.css':
+				$scss=substr($file,0,-3).'scss';
+				if(file_exists($scss)){return true;}
+				if(file_exists(str_replace('/css/','/scss/',$scss))){return true;}
+				if(file_exists(str_replace('/css/','/_scss/',$scss))){return true;}
+				return false;
+		}
+		return false;
 	}
 }
 
