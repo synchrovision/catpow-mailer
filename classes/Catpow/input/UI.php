@@ -11,13 +11,12 @@ class UI extends input{
 		switch($name){
 			case 'ui':{
 				if(isset($this->conf[$name])){return $this->conf[$name];}
-				return static::$ui;
+				if(isset(static::$ui))return static::$ui;
+				return substr(strrchr(get_class($this),'\\'),1);
 			}
 			case 'props':{
 				return array_merge(array_intersect_key($this->conf,static::$defaultProps),['value'=>$this->value]);
 			}
-				
-				
 		}
 		return parent::__get($name);
 	}
