@@ -11,8 +11,8 @@ class mail extends database{
 			'meta'=>[],'alias'=>'mails','alias_template'=>['mailform']
 		],$conf);
 		$conf['meta']=array_merge([
-			'name'=>['type'=>'text','label'=>__('お名前','catpow')],
-			'email'=>['type'=>'email','label'=>__('メールアドレス','catpow'),'required'=>1]
+			'name'=>['type'=>'text','label'=>__('お名前')],
+			'email'=>['type'=>'email','label'=>__('メールアドレス'),'required'=>1]
 		],$conf['meta']);
 	}
 }

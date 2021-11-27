@@ -8,7 +8,7 @@ class text_length extends validation{
 		return mb_strlen($val)!==(int)$input->conf['length'];
 	}
 	public static function get_message_format($conf){
-		return _('%d文字で入力してください');
+		return __('%d文字で入力してください');
 	}
 }
 

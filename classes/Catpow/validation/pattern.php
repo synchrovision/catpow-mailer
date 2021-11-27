@@ -7,7 +7,7 @@ class pattern extends validation{
 		return preg_match($pattern,$val);
 	}
 	public static function get_message_format($conf){
-		return _('入力形式が正しくありません');
+		return __('入力形式が正しくありません');
 	}
 }
 

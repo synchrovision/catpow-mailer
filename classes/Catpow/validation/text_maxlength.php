@@ -8,7 +8,7 @@ class text_maxlength extends validation{
 		return mb_strlen($val)<=(int)$input->conf['maxlength'];
 	}
 	public static function get_message_format($conf){
-		return _('%d文字以内で入力してください');
+		return __('%d文字以内で入力してください');
 	}
 }
 

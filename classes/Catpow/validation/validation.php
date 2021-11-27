@@ -12,7 +12,7 @@ class validation{
 	public static function is_valid(&$val,$input){return true;}
 	
 	public static function get_message_format($conf){
-		return _('%sの入力が正しくありません');
+		return __('%sの入力が正しくありません');
 	}
 	public static function get_message($conf){
 		$class_name=get_called_class();

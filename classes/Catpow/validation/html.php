@@ -12,7 +12,7 @@ class html extends validation{
 	}
 	
 	public static function get_message_format($conf){
-		return _('HTML構文にエラーがあります');
+		return __('HTML構文にエラーがあります');
 	}
 }
 

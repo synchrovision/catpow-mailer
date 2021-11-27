@@ -16,7 +16,7 @@ class selection extends validation{
 		return false;
 	}
 	public static function get_message_format($conf){
-		return _('選択項目にない値です');
+		return __('選択項目にない値です');
 	}
 }
 

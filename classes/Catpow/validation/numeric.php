@@ -5,7 +5,7 @@ class numeric extends pattern{
 	public static  $pattern='/^[\-+]?\d+(\.\d+)?$/';
 	
 	public static function get_message_format($conf){
-		return _('数値で入力してください');
+		return __('数値で入力してください');
 	}
 }
 

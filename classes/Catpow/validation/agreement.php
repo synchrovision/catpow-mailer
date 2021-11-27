@@ -6,7 +6,7 @@ class agreement extends validation{
 		return !empty($val);
 	}
 	public static function get_message_format($conf){
-		return _('チェックしてください');
+		return __('チェックしてください');
 	}
 }
 

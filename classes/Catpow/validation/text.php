@@ -7,7 +7,7 @@ class text extends validation{
 		return true;
 	}
 	public static function get_message_format($conf){
-		return _('不正な値です');
+		return __('不正な値です');
 	}
 }
 

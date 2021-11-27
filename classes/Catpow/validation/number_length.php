@@ -9,7 +9,7 @@ class number_length extends validation{
 	}
 	
 	public static function get_message_format($conf){
-		return _('%d桁の数字で入力してください');
+		return __('%d桁の数字で入力してください');
 	}
 }
 
