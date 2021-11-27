@@ -21,7 +21,9 @@ class I18n{
 			);
 			if(!empty($mo_files[static::$locale])){
 				static::$translations=new MO();
-				static::$translations->import_from_file($mo_files[static::$locale]);
+				foreach($mo_files[static::$locale] as $mo_file){
+					static::$translations->import_from_file($mo_file);
+				}
 			}
 			else{static::$translations=false;}
 		}
@@ -29,10 +31,10 @@ class I18n{
 		return static::$translations->translate($str);
 	}
 	public static function get_mo_files(){
-		$rtn=['ja'=>false];
+		$rtn=['ja'=>[]];
 		foreach([\MAILER_DIR,\FORM_DIR] as $dir){
 			foreach(scandir($dir.'/languages') as $fname){
-				if(substr($fname,-3)==='.mo'){$rtn[substr($fname,0,-3)]=$dir.'/languages/'.$fname;}
+				if(substr($fname,-3)==='.mo'){$rtn[substr($fname,0,-3)][]=$dir.'/languages/'.$fname;}
 			}
 		}
 		return $rtn;
