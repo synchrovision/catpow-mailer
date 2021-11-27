@@ -26,7 +26,7 @@ try{
 	$form->verify_nonce();
 	$f=FORM_DIR.'/form/'.$action.'.php';
 	if(!file_exists($f)){throw new Exception('Forbidden',403);}
-	Catpow\util\I18n::setup(isset($form->config['locale'])?$form->config['locale']:'ja_JP');
+	include MAILER_DIR.'/functions.php';
 	include $f;
 	$res['status']='200';
 	$res['html']=ob_get_clean();
