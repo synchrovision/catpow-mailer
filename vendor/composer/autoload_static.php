@@ -6,6 +6,20 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitd35324e9f39abc14042f9528df529643
 {
+    public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'POMO\\' => 5,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'POMO\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/pomo/pomo/src',
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'EasyPeasyICS' => __DIR__ . '/..' . '/phpmailer/phpmailer/extras/EasyPeasyICS.php',
@@ -21,6 +35,8 @@ class ComposerStaticInitd35324e9f39abc14042f9528df529643
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInitd35324e9f39abc14042f9528df529643::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitd35324e9f39abc14042f9528df529643::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInitd35324e9f39abc14042f9528df529643::$classMap;
 
         }, null, ClassLoader::class);
