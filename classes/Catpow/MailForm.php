@@ -169,7 +169,7 @@ class MailForm{
 					"AddType application/octet-stream .csv\n"
 				);
 			}
-			file_put_contents($f,'');
+			file_put_contents($f,pack('C*',0xEF,0xBB,0xBF));
 			$h=fopen($f,'a');
 			$labels=array();
 			foreach($inputs as $input){$labels[]=$input['label'];}
