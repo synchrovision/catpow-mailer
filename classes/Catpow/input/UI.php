@@ -15,7 +15,7 @@ class UI extends input{
 				return substr(strrchr(get_class($this),'\\'),1);
 			}
 			case 'props':{
-				return array_merge(array_intersect_key($this->conf,static::$defaultProps),['value'=>$this->value]);
+				return array_merge(array_intersect_key($this->conf,static::$defaultProps),['name'=>$this->name,'value'=>$this->value]);
 			}
 		}
 		return parent::__get($name);
