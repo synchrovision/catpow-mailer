@@ -31,7 +31,7 @@ class MailForm{
 		return sprintf('<div class="cmf-input cmf-input_%s" data-input="%s">%s</div>',$this->inputs[$name]->type,$name,$this->inputs[$name]->input());
 	}
 	public function output($name){
-		if(isset($this->values[$name])){return $this->values[$name];}
+		if(isset($this->values[$name])){return $this->inputs[$name]->output();}
 		if(isset($this->config['inputs'][$name]['default'])){return $this->config['inputs'][$name]['default'];}
 		return '';
 	}
