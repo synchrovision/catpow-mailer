@@ -1,11 +1,11 @@
 <?php
 namespace Catpow;
-if(\PHP_VERSION_ID>=8000){
+if(\PHP_VERSION_ID>=80000){
 	include __DIR__.'/REST_Response-php8.php';
 	return;
 }
 class REST_Response implements \ArrayAccess{
-	public $status,$data=[];
+	public $status,$data=array();
 	public function __construct(){
 	}
 	public function __toString(){

@@ -50,7 +50,6 @@ Catpow.UI.ZipCode=(props)=>{
 		/>
 	));
 
-
 	return (
 		<div className={'ZipCode'}>
 			{input(0)}

@@ -12,6 +12,7 @@ class I18n{
 		textdomain($domain);
 	}
 	public static function translate($str){
+		if(!class_exists('Locale')){return $str;}
 		if(is_null(static::$translations)){
 			global $form;
 			$mo_files=static::get_mo_files();
@@ -31,8 +32,8 @@ class I18n{
 		return static::$translations->translate($str);
 	}
 	public static function get_mo_files(){
-		$rtn=['ja'=>[]];
-		foreach([\MAILER_DIR,\FORM_DIR] as $dir){
+		$rtn=array('ja'=>array());
+		foreach(array(\MAILER_DIR,\FORM_DIR) as $dir){
 			foreach(scandir($dir.'/languages') as $fname){
 				if(substr($fname,-3)==='.mo'){$rtn[substr($fname,0,-3)][]=$dir.'/languages/'.$fname;}
 			}

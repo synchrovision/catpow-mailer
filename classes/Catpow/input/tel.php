@@ -3,6 +3,6 @@ namespace Catpow\input;
 
 class tel extends input{
 	public static
-		$validation=['phone_number'];
+		$validation=array('phone_number');
 }
 ?>

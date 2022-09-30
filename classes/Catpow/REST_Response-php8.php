@@ -1,7 +1,7 @@
 <?php
 namespace Catpow;
 class REST_Response implements \ArrayAccess{
-	public $status,$data=[];
+	public $status,$data=array();
 	public function __construct(){
 	}
 	public function __toString(){

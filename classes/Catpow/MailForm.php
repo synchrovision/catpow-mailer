@@ -3,7 +3,7 @@ namespace Catpow;
 use PHPMailer;
 
 class MailForm{
-	public $nonce,$created,$expire,$inputs=[],$allowed_actions=[],$allowed_inputs=[],$agreements=[],$config,$values=[],$received=[],$errors=[];
+	public $nonce,$created,$expire,$inputs=array(),$allowed_actions=array(),$allowed_inputs=array(),$agreements=array(),$config,$values=array(),$received=array(),$errors=array();
 	public function __construct(){
 		include \FORM_DIR.'/config.php';
 		$this->config=$config;
@@ -15,7 +15,7 @@ class MailForm{
 		$this->refresh();
 	}
 	public static function get_instance(){
-		if(session_status() !== \PHP_SESSION_ACTIVE){session_start();}
+		if(!isset($_SESSION)){session_start();}
 		if(
 			!isset($_SESSION['MailForm'][\FORM_DIR]) || 
 			$_SESSION['MailForm'][\FORM_DIR]->expire < time() ||
@@ -53,9 +53,9 @@ class MailForm{
 	}
 	
 	public function agreement($label,$conf=null){
-		$conf=isset($conf)?$conf:[];
+		$conf=isset($conf)?$conf:array();
 		$conf['type']='checkbox';
-		$conf['value']=[$label];
+		$conf['value']=array($label);
 		$name=isset($conf['name'])?$conf['name']:'agreement';
 		$this->agreements[$name]=$conf;
 		$input=new input\checkbox($name,$conf,$this);
@@ -63,7 +63,7 @@ class MailForm{
 	}
 	public function receive($post=null){
 		$post=isset($post)?$post:$_POST;
-		$this->errors=[];
+		$this->errors=array();
 		if(!empty($this->agreements)){
 			foreach($this->agreements as $key=>$conf){
 				if(empty($post[$key])){
@@ -90,11 +90,11 @@ class MailForm{
 			}
 		}
 		if(!empty($this->errors)){
-			$this->received=[];
+			$this->received=array();
 			throw new MailFormException($this->errors);
 		}
 		$this->values=array_merge($this->values,$this->received);
-		$this->received=[];
+		$this->received=array();
 	}
 	
 	public function get_mailer(){
@@ -120,9 +120,9 @@ class MailForm{
 		ob_start();
 		include $f;
 		$defaultHeaders=$this->config['defaultHeaders'];
-		call_user_func_array([$mailer,'setFrom'],self::parse_address(isset($from)?$from:$defaultHeaders['from']));
+		call_user_func_array(array($mailer,'setFrom'),self::parse_address(isset($from)?$from:$defaultHeaders['from']));
 		foreach((array)(isset($to)?$to:$defaultHeaders['to']) as $toAddress){
-			call_user_func_array([$mailer,'addAddress'],self::parse_address($toAddress));
+			call_user_func_array(array($mailer,'addAddress'),self::parse_address($toAddress));
 		}
 		$mailer->Subject=mb_encode_mimeheader(isset($subject)?$subject:$defaultHeaders['subject']);
 		if(!empty($isHTML)){$mailer->isHTML(true);}
@@ -136,14 +136,14 @@ class MailForm{
 	}
 	
 	public function clear(){
-		$this->agreements=[];
-		$this->allowed_actions=[];
-		$this->allowed_inputs=[];
+		$this->agreements=array();
+		$this->allowed_actions=array();
+		$this->allowed_inputs=array();
 	}
 	public function clear_all(){
 		$this->clear();
-		$this->values=[];
-		$this->received=[];
+		$this->values=array();
+		$this->received=array();
 	}
 	public function verify_nonce(){
 		if($this->nonce!==$_SERVER['HTTP_X_CMF_NONCE']){throw new \Exception('Forbidden',403);};
@@ -173,48 +173,49 @@ class MailForm{
 			$h=fopen($f,'a');
 			$labels=array();
 			foreach($inputs as $input){$labels[]=$input['label'];}
-			fputcsv($h,array_merge($labels,['ipAddress','DateTime']));
+			$labels=array_merge($labels,array('ipAddress','DateTime'));
+			fputcsv($h,$labels);
 		}
 		else{
 			$h=fopen($f,'a');
 		}
-		$values=[];
+		$values=array();
 		foreach($inputs as $name=>$conf){$values[]=$this->values[$name];}
-		fputcsv($h,array_merge($values,[$_SERVER["REMOTE_ADDR"],date("Y/m/d (D) H:i:s",time())]));
+		fputcsv($h,array_merge($values,array($_SERVER["REMOTE_ADDR"],date("Y/m/d (D) H:i:s",time()))));
 		fclose($h);
 	}
 	public static function parse_address($address){
 		if(preg_match('/^(?P<name>.+)<(?P<email>.+@.+)>$/u',$address,$matches)){
-			return [$matches['email'],mb_encode_mimeheader($matches['name'])];
+			return array($matches['email'],mb_encode_mimeheader($matches['name']));
 		}
-		return [$address,''];
+		return array($address,'');
 	}
 	public static function get_json($name){
 		$path='/json/'.$name.'.json';
 		if(file_exists($f=\FORM_DIR.$path) || file_exists($f=\MAILER_DIR.$path)){
 			return json_decode(file_get_contents($f),true);
 		}
-		return [];
+		return array();
 	}
 	
 	public function render_ui_loader_script(){
-		$deps=[];
+		$deps=array();
 		foreach($this->inputs as $input){
 			if(is_null($input->ui)){continue;}
 			$deps=array_merge_recursive(static::get_deps('/ui/'.$input->ui),$deps);
 		}
-		foreach(array_keys($deps['script']) as $script){
+		foreach(array_keys((array)$deps['script']) as $script){
 			echo "Catpow.MailForm.loadScript('{$script}');\n";
 		}
-		foreach(array_keys($deps['style']) as $style){
+		foreach(array_keys((array)$deps['style']) as $style){
 			echo "Catpow.MailForm.loadStyle('{$style}');\n";
 		}
 		printf("Catpow.MailForm.requireReact=%s;\n",empty($deps)?'false':'true');
 	}
 	public static function get_deps($path){
-		$deps=[];
-		foreach(['script'=>'/component.js','style'=>'/style.css'] as $type=>$fname){
-			foreach([\FORM_DIR=>\FORM_URI,\MAILER_DIR=>\MAILER_URI] as $dir=>$uri){
+		$deps=array();
+		foreach(array('script'=>'/component.js','style'=>'/style.css') as $type=>$fname){
+			foreach(array(\FORM_DIR=>\FORM_URI,\MAILER_DIR=>\MAILER_URI) as $dir=>$uri){
 				if(self::file_should_exists($dir.$path.$fname)){
 					$deps[$type][$uri.$path.$fname]=true;
 					break;

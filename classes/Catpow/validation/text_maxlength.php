@@ -1,8 +1,8 @@
-meta<?php
+<?php
 namespace Catpow\validation;
 
 class text_maxlength extends validation{
-	public static $message_keys=['maxlength'];
+	public static $message_keys=array('maxlength');
 	
 	public static function is_valid(&$val,$input){
 		return mb_strlen($val)<=(int)$input->conf['maxlength'];

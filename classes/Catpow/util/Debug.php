@@ -5,7 +5,7 @@ class Debug{
 		echo '<div id="cp_log">';
 		$bt=debug_backtrace()[0];
 		printf('<small>%s(%s)</small><br/>',basename($bt['file']),$bt['line']);
-		$fnc_dump_as_table=function($vals,$refs=[])use(&$fnc_dump_as_table){
+		$fnc_dump_as_table=function($vals,$refs=array())use(&$fnc_dump_as_table){
 			if(is_array($vals) || is_object($vals)){
 				if(is_object($vals)){
 					if(in_array($vals,$refs)){echo '...';return;}

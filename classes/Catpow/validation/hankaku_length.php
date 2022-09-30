@@ -2,7 +2,7 @@
 namespace Catpow\validation;
 
 class hankaku_length extends validation{
-	public static $message_keys=['length'];
+	public static $message_keys=array('length');
 	
 	public static function is_valid(&$val,$input){
 		return preg_match(sprintf('/^[a-zA-Z0-9]{%d}$/',$input->conf['length']),$val);

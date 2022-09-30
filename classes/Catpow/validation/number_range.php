@@ -2,7 +2,7 @@
 namespace Catpow\validation;
 
 class number_length extends validation{
-	public static $message_keys=['min','max'];
+	public static $message_keys=array('min','max');
 	
 	public static function is_valid(&$val,$input){
 		return (float)$val>=(float)$input->conf['min'] and (float)$val<=(float)$input->conf['max'];

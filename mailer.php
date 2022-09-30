@@ -38,7 +38,7 @@ catch(Catpow\MailFormException $e){
 catch(Throwable $e){
 	ob_end_clean();
 	$res['status']=$e->getCode();
-	$res['error']=['@form'=>$e->getMessage()];
+	$res['error']=array('@form'=>$e->getMessage());
 }
 header("Content-Type: application/json; charset=utf-8");
 echo $res;

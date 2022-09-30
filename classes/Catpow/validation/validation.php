@@ -7,7 +7,7 @@ namespace Catpow\validation;
 */
 
 class validation{
-	public static $message_keys=['label'];
+	public static $message_keys=array('label');
 	
 	public static function is_valid(&$val,$input){return true;}
 	
@@ -18,7 +18,7 @@ class validation{
 		$class_name=get_called_class();
 		$base_class_name=substr($class_name,strrpos($class_name,'\\')+1);
 		$message=isset($conf['validation_message'][$base_class_name])?$conf['validation_message'][$base_class_name]:static::get_message_format($conf);
-		$message_vals=[];
+		$message_vals=array();
 		foreach(static::$message_keys as $message_key){
 			$message_vals[]=isset($conf[$message_key])?$conf[$message_key]:'';
 		}

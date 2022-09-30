@@ -2,7 +2,7 @@
 namespace Catpow\input;
 
 class UI extends input{
-	public static $ui=null,$defaultProps=[];
+	public static $ui=null,$defaultProps=array();
 	
 	public function input(){
 		return sprintf('<div class="cmf-ui" data-ui="%s">%s</div>',$this->ui,json_encode($this->props,0500));
@@ -15,7 +15,7 @@ class UI extends input{
 				return substr(strrchr(get_class($this),'\\'),1);
 			}
 			case 'props':{
-				return array_merge(array_intersect_key($this->conf,static::$defaultProps),['name'=>$this->name,'value'=>$this->value]);
+				return array_merge(array_intersect_key($this->conf,static::$defaultProps),array('name'=>$this->name,'value'=>$this->value));
 			}
 		}
 		return parent::__get($name);
