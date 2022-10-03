@@ -15,7 +15,7 @@ class BasicAuth{
 		$txt_htpasswd=$account.':'.crypt($password,'zr').chr(10);
 		file_put_contents($dir.'/.htaccess',$txt_htaccess);
 		file_put_contents($dir.'/.htpasswd',$txt_htpasswd);
-		return compact('accout','password');
+		return compact('account','password');
 	}
 }
 
