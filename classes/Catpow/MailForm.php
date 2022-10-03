@@ -28,7 +28,7 @@ class MailForm{
 	
 	public function input($name){
 		$this->allow_input($name);
-		return sprintf('<div class="cmf-input cmf-input_%s" data-input="%s">%s</div>',$this->inputs[$name]->type,$name,$this->inputs[$name]->input());
+		return sprintf('<div class="cmf-input is-type-%s" data-input="%s">%s</div>',$this->inputs[$name]->type,$name,$this->inputs[$name]->input());
 	}
 	public function output($name){
 		if(isset($this->values[$name])){return $this->inputs[$name]->output();}

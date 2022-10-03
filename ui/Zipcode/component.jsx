@@ -4,6 +4,7 @@
 
 Catpow.UI.ZipCode=(props)=>{
 	const {useCallback,useState,useRef,useEffect}=React;
+	const {className="cmf-ui-zipcode"}=props;
 	const {HiddenValues}=Catpow.Components;
 	const refs=[useRef(),useRef()];
 	const [value,setValue]=useState(props.value || '-');
@@ -26,6 +27,7 @@ Catpow.UI.ZipCode=(props)=>{
 		}
 	},[]);
 	useEffect(()=>{
+		if(undefined === AjaxZip3){return;}
 		AjaxZip3.zip2addr(refs[0].current,refs[1].current,props.pref,props.addr);
 	},[value]);
 	
@@ -33,7 +35,7 @@ Catpow.UI.ZipCode=(props)=>{
 		<input
 			type="text"
 			size={["3","4"][i]}
-			className={"sec"+i}
+			className={className+"__sec"+i}
 			onChange={(e)=>{
 				var val=e.target.value;
 				setSec(i,e.target.value,isComposing);
@@ -48,12 +50,12 @@ Catpow.UI.ZipCode=(props)=>{
 			ref={refs[i]}
 			value={secs[i]}
 		/>
-	));
+	),[className,setSec,setIsComposing]);
 
 	return (
-		<div className={'ZipCode'}>
+		<div className={className}>
 			{input(0)}
-			<span class="sep">-</span>
+			<span className={className+"__sep"}>-</span>
 			{input(1)}
 
 			<HiddenValues

@@ -11,8 +11,8 @@ class textarea extends input{
 	}
 	public function input(){
 		return sprintf(
-			'<textarea name="%s"%s>%s</textarea>',
-			$this->name,$this->attr,$this->value
+			'<textarea class="%s" name="%s"%s>%s</textarea>',
+			$this->className,$this->name,$this->attr,$this->value
 		);
 	}
 }

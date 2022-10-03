@@ -18,8 +18,8 @@ abstract class input{
 	}
 	public function input(){
 		return sprintf(
-			'<input type="%s" name="%s" value="%s"%s/>',
-			isset(static::$input_type)?static::$input_type:'text',
+			'<input class="%s" type="%s" name="%s" value="%s"%s/>',
+			$this->className,isset(static::$input_type)?static::$input_type:'text',
 			$this->name,$this->value,$this->attr
 		);
 	}
@@ -27,6 +27,7 @@ abstract class input{
 	public function __get($name){
 		switch($name){
 			case 'type':return isset(static::$input_type)?static::$input_type:$this->conf['type'];
+			case 'className':return sprintf('cmf-input-%s',$this->type);
 			case 'label':return isset($this->conf['label'])?$this->conf['label']:$this->name;
 			case 'received':return isset($this->form->reserved[$this->name])?$this->form->reserved[$this->name]:'';
 			case 'value':

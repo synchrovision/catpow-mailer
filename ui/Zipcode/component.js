@@ -20,6 +20,8 @@ Catpow.UI.ZipCode = function (props) {
       useState = _React.useState,
       useRef = _React.useRef,
       useEffect = _React.useEffect;
+  var _props$className = props.className,
+      className = _props$className === void 0 ? "cmf-ui-zipcode" : _props$className;
   var HiddenValues = Catpow.Components.HiddenValues;
   var refs = [useRef(), useRef()];
 
@@ -54,13 +56,17 @@ Catpow.UI.ZipCode = function (props) {
     }
   }, []);
   useEffect(function () {
+    if (undefined === AjaxZip3) {
+      return;
+    }
+
     AjaxZip3.zip2addr(refs[0].current, refs[1].current, props.pref, props.addr);
   }, [value]);
   var input = useCallback(function (i) {
     return /*#__PURE__*/React.createElement("input", {
       type: "text",
       size: ["3", "4"][i],
-      className: "sec" + i,
+      className: className + "__sec" + i,
       onChange: function onChange(e) {
         var val = e.target.value;
         setSec(i, e.target.value, isComposing);
@@ -75,11 +81,11 @@ Catpow.UI.ZipCode = function (props) {
       ref: refs[i],
       value: secs[i]
     });
-  });
+  }, [className, setSec, setIsComposing]);
   return /*#__PURE__*/React.createElement("div", {
-    className: 'ZipCode'
+    className: className
   }, input(0), /*#__PURE__*/React.createElement("span", {
-    class: "sep"
+    className: className + "__sep"
   }, "-"), input(1), /*#__PURE__*/React.createElement(HiddenValues, {
     name: props.name,
     value: value
