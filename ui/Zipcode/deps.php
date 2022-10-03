@@ -1,4 +1,0 @@
-<?php
-$useComponents=array(
-	'HiddenValues'
-);
