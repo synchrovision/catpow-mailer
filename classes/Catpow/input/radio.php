@@ -16,7 +16,7 @@ class radio extends select{
 				'<span class="%1$s__item-text">%s</span>'.
 				'</label>',
 				$className,$name,$s,
-				($s==$val)?' selected="selected"':'',is_int($i)?$s:$i
+				($s==$val)?' checked="checked"':'',is_int($i)?$s:$i
 			);
 		}
 		$rtn.='</div>';
