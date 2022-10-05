@@ -92,7 +92,9 @@ Catpow.MailForm=function(form){
 			});
 		});
 		cmf.updateState();
+		form.dispatchEvent(cmf.resetEvent);
 	};
+	cmf.resetEvent=new Event('reset');
 	cmf.updateState=function(){
 		cmf.agreed=cmf.agreementCheckboxes.every(function(checkbox){return checkbox.checked;});
 		cmf.sealedButtons.map(function(button){
