@@ -201,6 +201,20 @@ class MailForm{
 	public function render_ui_loader_script(){
 		$deps=array();
 		foreach($this->inputs as $input){
+			if(!is_null($input->useScripts)){
+				foreach($input->useScripts as $useScript){
+					if($useScriptURL=self::get_js_file_url($useScript)){
+						$deps['script'][$useScriptURL]=true;
+					}
+				}
+			}
+			if(!is_null($input->useStyles)){
+				foreach($input->useStyles as $useStyle){
+					if($useStyleURL=self::get_css_file_url($useStyle)){
+						$deps['style'][$useStyleURL]=true;
+					}
+				}
+			}
 			if(is_null($input->ui)){continue;}
 			$deps=array_merge_recursive(static::get_deps('/ui/'.$input->ui),$deps);
 		}
@@ -235,8 +249,35 @@ class MailForm{
 					$deps=array_merge_recursive(self::get_deps('/components/'.$useComponent),$deps);
 				}
 			}
+			if(!empty($useScripts)){
+				foreach($useScripts as $useScript){
+					if($useScriptURL=self::get_js_file_url($useScript)){
+						$deps['script'][$useScriptURL]=true;
+					}
+				}
+			}
+			if(!empty($useStyles)){
+				foreach($useStyles as $useStyle){
+					if($useStyleURL=self::get_css_file_url($useStyle)){
+						$deps['style'][$useStyleURL]=true;
+					}
+				}
+			}
 		}
 		return $deps;
+	}
+	public static function get_file_url($path){
+		if(self::file_should_exists(\FORM_DIR.$path)){return \FORM_URI.$path;}
+		if(self::file_should_exists(\MAILER_DIR.$path)){return \MAILER_URI.$path;}
+		return null;
+	}
+	public static function get_js_file_url($path){
+		if(strpos($path,'://')!==false){return $path;}
+		return self::get_file_url('/js/'.$path.'.js');
+	}
+	public static function get_css_file_url($path){
+		if(strpos($path,'://')!==false){return $path;}
+		return self::get_file_url('/css/'.$path.'.css');
 	}
 	public static function file_should_exists($file){
 		if(file_exists($file)){return true;}
