@@ -82,7 +82,7 @@ Catpow.UI.ZipCode = function (props) {
     className: className
   }, input(0), /*#__PURE__*/React.createElement("span", {
     className: className + "__sep"
-  }, "-"), input(1), /*#__PURE__*/React.createElement(HiddenValues, {
+  }, "-"), input(1), value && value !== '-' && /*#__PURE__*/React.createElement(HiddenValues, {
     name: props.name,
     value: value
   }));

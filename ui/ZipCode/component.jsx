@@ -53,11 +53,12 @@
 			{input(0)}
 			<span className={className+"__sep"}>-</span>
 			{input(1)}
-
-			<HiddenValues
-				name={props.name}
-				value={value}
-			/>
+			{value && value!=='-' && (
+				<HiddenValues
+					name={props.name}
+					value={value}
+				/>
+			)}
 		</div>
 	);
 }
