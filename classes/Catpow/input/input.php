@@ -52,6 +52,14 @@ abstract class input{
 				if($this->required){$attr.=' required';}
 				return $attr;
 			}
+			case 'useScripts':{
+				if(isset(static::$useScripts))return static::$useScripts;
+				return null;
+			}
+			case 'useStyles':{
+				if(isset(static::$useStyles))return static::$useStyles;
+				return null;
+			}
 				
 		}
 		if(isset($this->conf[$name])){return $this->conf[$name];}
