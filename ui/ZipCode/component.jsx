@@ -1,8 +1,4 @@
-﻿if(!("AjaxZip3" in window)){
-	Catpow.MailForm.loadScript('https://ajaxzip3.github.io/ajaxzip3.js');
-}
-
-Catpow.UI.ZipCode=(props)=>{
+﻿Catpow.UI.ZipCode=(props)=>{
 	const {useCallback,useState,useRef,useEffect}=React;
 	const {className="cmf-ui-zipcode"}=props;
 	const {HiddenValues}=Catpow.Components;

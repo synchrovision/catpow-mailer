@@ -10,10 +10,6 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-if (!("AjaxZip3" in window)) {
-  Catpow.MailForm.loadScript('https://ajaxzip3.github.io/ajaxzip3.js');
-}
-
 Catpow.UI.ZipCode = function (props) {
   var _React = React,
       useCallback = _React.useCallback,
