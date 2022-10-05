@@ -28,6 +28,21 @@ abstract class input{
 		switch($name){
 			case 'type':return isset(static::$input_type)?static::$input_type:$this->conf['type'];
 			case 'className':return sprintf('cmf-input-%s',$this->type);
+			case 'blockClassName':{
+				$blockClassName=sprintf('is-type-%s',$this->type);
+				if(is_a($this,text::class)){
+					$blockClassName.=' is-text-input';
+					if(!empty($this->conf['size'])){$blockClassName.=' has-size';}
+				}
+				elseif(is_a($this,textarea::class)){
+					$blockClassName.=' is-textarea-input';
+					if(!empty($this->conf['rows'])){$blockClassName.=' has-rows';}
+					if(!empty($this->conf['cols'])){$blockClassName.=' has-cols';}
+				}
+				elseif(is_a($this,select::class)){$blockClassName.=' is-select-input';}
+				elseif(is_a($this,UI::class)){$blockClassName.=' is-ui-input';}
+				return $blockClassName;
+			}
 			case 'label':return isset($this->conf['label'])?$this->conf['label']:$this->name;
 			case 'received':return isset($this->form->reserved[$this->name])?$this->form->reserved[$this->name]:'';
 			case 'value':
