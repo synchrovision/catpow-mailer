@@ -30,17 +30,17 @@ abstract class input{
 			case 'className':return sprintf('cmf-input-%s',$this->type);
 			case 'blockClassName':{
 				$blockClassName=sprintf('is-type-%s',$this->type);
-				if(is_a($this,text::class)){
+				if(is_a($this,'\Catpow\input\text')){
 					$blockClassName.=' is-text-input';
 					if(!empty($this->conf['size'])){$blockClassName.=' has-size';}
 				}
-				elseif(is_a($this,textarea::class)){
+				elseif(is_a($this,'\Catpow\input\textarea')){
 					$blockClassName.=' is-textarea-input';
 					if(!empty($this->conf['rows'])){$blockClassName.=' has-rows';}
 					if(!empty($this->conf['cols'])){$blockClassName.=' has-cols';}
 				}
-				elseif(is_a($this,select::class)){$blockClassName.=' is-select-input';}
-				elseif(is_a($this,UI::class)){$blockClassName.=' is-ui-input';}
+				elseif(is_a($this,'\Catpow\input\select')){$blockClassName.=' is-select-input';}
+				elseif(is_a($this,'\Catpow\input\UI')){$blockClassName.=' is-ui-input';}
 				return $blockClassName;
 			}
 			case 'label':return isset($this->conf['label'])?$this->conf['label']:$this->name;
