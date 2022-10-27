@@ -41,6 +41,10 @@
 				state.maxTime=state.max.getTime();
 				state.minYear=state.min.getFullYear();
 				state.maxYear=state.max.getFullYear();
+				state.minMonth=1;
+				state.maxMonth=12;
+				state.minDate=1;
+				state.maxDate=31;
 				action.value=props.value;
 				return {...state};
 			}
