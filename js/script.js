@@ -27,7 +27,13 @@ Catpow.MailForm=function(form){
 		xhr.responseType='text';
 		xhr.onload=function(){
 			if(xhr.readyState===4 && xhr.status===200){
-				var res=JSON.parse(xhr.response);
+				var res;
+				try{
+					res=JSON.parse(xhr.response);
+				}
+				catch(e){
+					res={error:{"@form":xhr.responseText}};
+				}
 				if(res.error){
 					Object.keys(res.error).map(function(key){
 						if(key==='@form'){cmf.alert(res.error[key]);}
