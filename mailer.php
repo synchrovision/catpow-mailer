@@ -6,6 +6,8 @@ define('MAILER_DIR',__DIR__);
 define('MAILER_URI',dirname($_SERVER['REQUEST_URI']));
 define('FORM_DIR',dirname(__DIR__));
 define('FORM_URI',dirname(MAILER_URI));
+define('LOG_DIR',FORM_DIR.'/log');
+define('UPLOADS_DIR',FORM_DIR.'/log/uploads');
 spl_autoload_register(function($class){
 	$path=str_replace('\\','/',$class);
 	if(file_exists($f=FORM_DIR.'/classes/'.$path.'.php')){include($f);}
