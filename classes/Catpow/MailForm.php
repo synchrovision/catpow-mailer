@@ -184,7 +184,9 @@ class MailForm{
 			$h=fopen($f,'a');
 		}
 		$values=array();
-		foreach($inputs as $name=>$conf){$values[]=$this->values[$name];}
+		foreach($inputs as $name=>$conf){
+			$values[]=$this->inputs[$name]->get_log_value();
+		}
 		fputcsv($h,array_merge($values,array($_SERVER["REMOTE_ADDR"],date("Y/m/d (D) H:i:s",time()))));
 		fclose($h);
 	}
