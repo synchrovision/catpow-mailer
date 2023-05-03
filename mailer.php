@@ -24,6 +24,14 @@ if($_SERVER['REQUEST_METHOD']=='GET'){
 	die();
 }
 $res=new Catpow\REST_Response();
+while(ob_get_level()){
+	if(!empty($maybe_error_message=ob_get_clean())){
+		$res['status']=500;
+		$res['error']=array('@form'=>$maybe_error_message);
+		echo $res;
+		die();
+	}
+}
 ob_start();
 $action=preg_replace('/\W/','',$_POST['action']);
 try{
