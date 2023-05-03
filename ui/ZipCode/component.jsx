@@ -23,8 +23,8 @@
 		}
 	},[]);
 	useEffect(()=>{
-		if(undefined === AjaxZip3){return;}
-		AjaxZip3.zip2addr(refs[0].current,refs[1].current,props.pref,props.addr);
+		if(undefined === window.AjaxZip3){return;}
+		window.AjaxZip3.zip2addr(refs[0].current,refs[1].current,props.pref,props.addr);
 	},[value]);
 	
 	const input=useCallback((i)=>(
