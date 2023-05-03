@@ -23,6 +23,9 @@ abstract class input{
 			$this->name,$this->value,$this->attr
 		);
 	}
+	public function get_log_value(){
+		return $this->form->values[$this->name];
+	}
 	
 	public function __get($name){
 		switch($name){
