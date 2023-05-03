@@ -77,7 +77,10 @@ class MailForm{
 		}
 		$this->received=array_merge(
 			$this->allowed_inputs,
-			array_intersect_key($post,$this->allowed_inputs)
+			array_intersect_key($post,$this->allowed_inputs),
+			array_intersect_key(array_filter($_FILES,function($file){
+				return !empty($file['tmp_name']);
+			}),$this->allowed_inputs)
 		);
 		foreach($this->received as $key=>$val){
 			$input=$this->inputs[$key];
