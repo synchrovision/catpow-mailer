@@ -6,7 +6,7 @@ class select extends input{
 	public function input(){
 		$val=$this->value;
 		$rtn=sprintf(
-			'<select name="%s"%s>',
+			'<select class="cmf-input-select" name="%s"%s>',
 			$this->name,$this->attr
 		);
 		$rtn.=sprintf('<option value="">%s</option>',isset($conf['defaultLabel'])?$conf['defaultLabel']:'---');
