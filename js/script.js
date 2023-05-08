@@ -1,4 +1,4 @@
-/* global console gtag ga Catpow ReactDOM React*/
+/* global console gtag ga Catpow ReactDOM React Promise*/
 window.Catpow=window.Catpow || {};
 Catpow.Components=Catpow.Components || {};
 Catpow.UI=Catpow.UI || {};
@@ -151,14 +151,39 @@ Catpow.MailFormInput=function(input){
 }
 
 window.addEventListener('DOMContentLoaded',function(){
-	if(!Catpow.MailForm.requireReact || 'React' in window){
-		Array.prototype.forEach.call(document.querySelectorAll('form.cmf-form'),Catpow.MailForm);
-	}
-	else{
-		Catpow.MailForm.loadScript('https://unpkg.com/react@17/umd/react.production.min.js',function(){
-			Catpow.MailForm.loadScript('https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',function(){
-				Array.prototype.forEach.call(document.querySelectorAll('form.cmf-form'),Catpow.MailForm);
+	new Promise(function(resolve){
+		if(!Catpow.MailForm.requireReact || 'React' in window){
+			resolve();
+		}
+		else{
+			Catpow.MailForm.loadScript('https://unpkg.com/react@17/umd/react.production.min.js',function(){
+				Catpow.MailForm.loadScript('https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',function(){
+					resolve();
+				});
 			});
+		}
+	}).then(function(){
+		new Promise(function(resolve){
+			if(Catpow.MailForm.deps){
+				Catpow.MailForm.deps.styles.forEach(function(style){Catpow.MailForm.loadStyle(style);});
+				if(Catpow.MailForm.deps.scripts.length){
+					Promise.all(Catpow.MailForm.deps.scripts.map(function(script){
+						return new Promise(function(resolve){
+							Catpow.MailForm.loadScript(script,resolve);
+						});
+					})).then(function(){
+						resolve();
+					});
+				}
+				else{
+					resolve();
+				}
+			}
+			else{
+				resolve();
+			}
+		}).then(function(){
+			Array.prototype.forEach.call(document.querySelectorAll('form.cmf-form'),Catpow.MailForm);
 		});
-	}
+	});
 });

@@ -207,7 +207,7 @@ class MailForm{
 		return array();
 	}
 	
-	public function render_ui_loader_script(){
+	public function render_ui_register_script(){
 		$deps=array();
 		foreach($this->inputs as $input){
 			if(!is_null($input->useScripts)){
@@ -227,12 +227,10 @@ class MailForm{
 			if(is_null($input->ui)){continue;}
 			$deps=array_merge_recursive(static::get_deps('/ui/'.$input->ui),$deps);
 		}
-		foreach(array_keys((array)$deps['script']) as $script){
-			echo "Catpow.MailForm.loadScript('{$script}');\n";
-		}
-		foreach(array_keys((array)$deps['style']) as $style){
-			echo "Catpow.MailForm.loadStyle('{$style}');\n";
-		}
+		printf('Catpow.MailForm.deps=%s;',json_encode([
+			'scripts'=>array_keys((array)$deps['script']),
+			'styles'=>array_keys((array)$deps['style'])
+		],0700));
 		printf("Catpow.MailForm.requireReact=%s;\n",empty($deps)?'false':'true');
 	}
 	public static function get_deps($path){

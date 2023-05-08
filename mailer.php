@@ -20,7 +20,7 @@ if($_SERVER['REQUEST_METHOD']=='GET'){
 	header("Content-Type: text/javascript; charset=utf-8");
 	readfile(MAILER_DIR.'/js/script.js');
 	printf("\nCatpow.MailFormNonce=\"%s\";\n",$form->nonce);
-	$form->render_ui_loader_script();
+	$form->render_ui_register_script();
 	die();
 }
 $res=new Catpow\REST_Response();
