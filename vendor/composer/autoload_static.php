@@ -11,12 +11,20 @@ class ComposerStaticInit9725634c73ea23d8d4b7712ceca23146
         array (
             'POMO\\' => 5,
         ),
+        'M' => 
+        array (
+            'Maestroerror\\' => 13,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'POMO\\' => 
         array (
             0 => __DIR__ . '/..' . '/pomo/pomo/src',
+        ),
+        'Maestroerror\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maestroerror/php-heic-to-jpg/src',
         ),
     );
 

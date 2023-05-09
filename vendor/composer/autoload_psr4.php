@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'POMO\\' => array($vendorDir . '/pomo/pomo/src'),
+    'Maestroerror\\' => array($vendorDir . '/maestroerror/php-heic-to-jpg/src'),
 );

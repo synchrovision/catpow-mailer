@@ -1,6 +1,53 @@
 {
     "packages": [
         {
+            "name": "maestroerror/php-heic-to-jpg",
+            "version": "v0.4.0",
+            "version_normalized": "0.4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MaestroError/php-heic-to-jpg.git",
+                "reference": "24de85ee33376dd38c5ebec95e15144f3beb7dc5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MaestroError/php-heic-to-jpg/zipball/24de85ee33376dd38c5ebec95e15144f3beb7dc5",
+                "reference": "24de85ee33376dd38c5ebec95e15144f3beb7dc5",
+                "shasum": ""
+            },
+            "require-dev": {
+                "pestphp/pest": "2.x-dev"
+            },
+            "time": "2023-03-14T09:06:37+00:00",
+            "bin": [
+                "bin/heicToJpg",
+                "bin/heicToJpgWin"
+            ],
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Maestroerror\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "maestroerror",
+                    "email": "revaz.gh@gmail.com"
+                }
+            ],
+            "description": "Converts HEIC/HEIF image to JPG type, without any dependencies",
+            "support": {
+                "issues": "https://github.com/MaestroError/php-heic-to-jpg/issues",
+                "source": "https://github.com/MaestroError/php-heic-to-jpg/tree/v0.4.0"
+            },
+            "install-path": "../maestroerror/php-heic-to-jpg"
+        },
+        {
             "name": "phpmailer/phpmailer",
             "version": "v5.2.28",
             "version_normalized": "5.2.28.0",

@@ -4,8 +4,52 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e41f0846d341211db07bfc0dd7bdf560",
+    "content-hash": "d3526404cd57957e86836ae02d89ad15",
     "packages": [
+        {
+            "name": "maestroerror/php-heic-to-jpg",
+            "version": "v0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MaestroError/php-heic-to-jpg.git",
+                "reference": "24de85ee33376dd38c5ebec95e15144f3beb7dc5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MaestroError/php-heic-to-jpg/zipball/24de85ee33376dd38c5ebec95e15144f3beb7dc5",
+                "reference": "24de85ee33376dd38c5ebec95e15144f3beb7dc5",
+                "shasum": ""
+            },
+            "require-dev": {
+                "pestphp/pest": "2.x-dev"
+            },
+            "bin": [
+                "bin/heicToJpg",
+                "bin/heicToJpgWin"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Maestroerror\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "maestroerror",
+                    "email": "revaz.gh@gmail.com"
+                }
+            ],
+            "description": "Converts HEIC/HEIF image to JPG type, without any dependencies",
+            "support": {
+                "issues": "https://github.com/MaestroError/php-heic-to-jpg/issues",
+                "source": "https://github.com/MaestroError/php-heic-to-jpg/tree/v0.4.0"
+            },
+            "time": "2023-03-14T09:06:37+00:00"
+        },
         {
             "name": "phpmailer/phpmailer",
             "version": "v5.2.28",
