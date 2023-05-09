@@ -207,6 +207,9 @@ class MailForm{
 		return array();
 	}
 	
+	public function render_nonce_register_script(){
+		printf("\nCatpow.MailFormNonce=\"%s\";\n",$this->nonce);
+	}
 	public function render_ui_register_script(){
 		$deps=array();
 		foreach($this->inputs as $input){
