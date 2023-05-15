@@ -7,7 +7,8 @@ namespace Catpow\validation;
 */
 
 class validation{
-	public static $message_keys=array('label');
+	const UPLOAD_PHASE=1,INPUT_PHASE=2,CONFIRM_PHASE=4;
+	public static $message_keys=array('label'),$phase=self::INPUT_PHASE;
 	
 	public static function is_valid(&$val,$input){return true;}
 	
