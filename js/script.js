@@ -22,7 +22,7 @@ Catpow.MailForm=function(form){
 		var bnd=form.querySelector('.cmf-input.is-error').getBoundingClientRect();
 		window.scrollBy({top:bnd.top-200,behavior:'smooth'});
 	}
-	cmf.send=function(data,focus=true){
+	cmf.send=function(data,cb=false){
 		var xhr=new XMLHttpRequest();
 		xhr.responseType='text';
 		xhr.onload=function(){
@@ -35,19 +35,15 @@ Catpow.MailForm=function(form){
 					res={error:{"@form":xhr.responseText}};
 				}
 				if(res.error){
-					Object.keys(res.error).map(function(key){
-						if(key==='@form'){cmf.alert(res.error[key]);}
-						else{cmf.inputs[key].alert(res.error[key]);}
-					});
+					cmf.showError(res.error);
 					cmf.focusAlert();
 					return;
 				}
 				if(res.html){
 					form.innerHTML=res.html;
 					cmf.reset();
-					if(focus){cmf.focus();}
 				}
-				if(focus && res.uri){
+				if(res.uri && res.uri!==window.location.pathname){
 					history.pushState(res,null,res.uri);
 					if(window.gtag){
 						gtag('set','page_path',res.uri);
@@ -57,11 +53,21 @@ Catpow.MailForm=function(form){
 						ga('send','pageview',res.uri);
 					}
 				}
+				if(cb){cb(res);}
 			}
 		};
 		xhr.open('POST',Catpow.MailFormUrl);
 		xhr.setRequestHeader('X-CMF-NONCE',Catpow.MailFormNonce);
 		xhr.send(data);
+	};
+	cmf.showError=function(error){
+		Object.keys(error).map(function(key){
+			if(key==='@form'){cmf.alert(error[key]);}
+			else{cmf.inputs[key].alert(error[key]);}
+		});
+	};
+	cmf.getFileUrl=function(name){
+		return Catpow.MailFormUrl+'?render='+name;
 	};
 	cmf.alert=function(text){
 		var alert=form.querySelector('.cmf-form__alert');
@@ -86,7 +92,9 @@ Catpow.MailForm=function(form){
 			}
 		});
 		Array.prototype.forEach.call(form.querySelectorAll('.cmf-ui'),function(ui){
-			ReactDOM.render(React.createElement(Catpow.UI[ui.dataset.ui],JSON.parse(ui.textContent)),ui);
+			const props=JSON.parse(ui.textContent);
+			Object.assign(props,{cmf});
+			ReactDOM.render(React.createElement(Catpow.UI[ui.dataset.ui],props),ui);
 		});
 		Array.prototype.forEach.call(form.querySelectorAll('.cmf-button'),function(button){
 			if(button.classList.contains('sealed')){cmf.sealedButtons.push(button);}
@@ -94,7 +102,7 @@ Catpow.MailForm=function(form){
 				if(button.classList.contains('disabled')){return;}
 				var fd=new FormData(form);
 				fd.append('action',button.dataset.action);
-				cmf.send(fd);
+				cmf.send(fd,cmf.focus);
 			});
 		});
 		cmf.updateState();
@@ -113,7 +121,7 @@ Catpow.MailForm=function(form){
 		Object.keys(form.dataset).map(function(key){
 			fd.append(key,form.dataset[key]);
 		});
-		cmf.send(fd,false);
+		cmf.send(fd);
 	};
 	cmf.init();
 	return cmf;
