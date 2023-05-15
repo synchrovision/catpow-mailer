@@ -3,6 +3,7 @@ namespace Catpow;
 use PHPMailer;
 
 class MailForm{
+	public static $karma_format="%-20s %10d %12d\n";
 	public $nonce,$created,$expire,$inputs=array(),$allowed_actions=array(),$allowed_inputs=array(),$agreements=array(),$config,$values=array(),$received=array(),$errors=array();
 	public function __construct(){
 		include \FORM_DIR.'/config.php';
@@ -67,7 +68,7 @@ class MailForm{
 	}
 	public function receive($post=null){
 		$post=isset($post)?$post:$_POST;
-		$this->errors=array();
+		$this->reset_errors();
 		if(!empty($this->agreements)){
 			foreach($this->agreements as $key=>$conf){
 				if(empty($post[$key])){
@@ -78,9 +79,7 @@ class MailForm{
 		$this->received=array_merge(
 			$this->allowed_inputs,
 			array_intersect_key($post,$this->allowed_inputs),
-			array_intersect_key(array_filter($_FILES,function($file){
-				return !empty($file['tmp_name']);
-			}),$this->allowed_inputs)
+			$this->receive_files()
 		);
 		foreach($this->received as $key=>$val){
 			$input=$this->inputs[$key];
@@ -90,18 +89,175 @@ class MailForm{
 			}
 			foreach($input->validation as $validation){
 				$validationClass='\\Catpow\\validation\\'.$validation;
-				if(!$validationClass::is_valid($this->received[$key],$input)){
+				if(($validationClass::$phase & validation\validation::INPUT_PHASE) && !$validationClass::is_valid($this->received[$key],$input)){
 					$this->errors[$input->name]=$validationClass::get_message($input->conf);
 					continue;
 				}
+			}
+		}
+		foreach($input->validation as $validation){
+			$validationClass='\\Catpow\\validation\\'.$validation;
+			if(($validationClass::$phase & validation\validation::CONFIRM_PHASE) && !$validationClass::is_valid($this->received[$key],$input)){
+				$this->errors[$input->name]=$validationClass::get_message($input->conf);
+				continue;
 			}
 		}
 		if(!empty($this->errors)){
 			$this->received=array();
 			throw new MailFormException($this->errors);
 		}
-		$this->values=array_merge($this->values,$this->received);
-		$this->received=array();
+		$this->merge_values();
+	}
+	public function reset_errors(){
+		$this->errors=array();
+	}
+	public function merge_values($values=null){
+		if(isset($values)){
+			$this->values=array_merge($this->values,$values);
+		}
+		else{
+			$this->values=array_merge($this->values,$this->received);
+			$this->received=array();
+		}
+	}
+	public function receive_files($files=null){
+		$files=isset($files)?$files:$_FILES;
+		$files=array_intersect_key(array_filter($files,function($file){
+			return !empty($file['tmp_name']);
+		}),$this->allowed_inputs);
+		foreach($files as $name=>$file){
+			$input=$this->inputs[$name];
+			foreach($input->validation as $validation){
+				$validationClass='\\Catpow\\validation\\'.$validation;
+				if(($validationClass::$phase & validation\validation::UPLOAD_PHASE) && !$validationClass::is_valid($file,$input)){
+					$this->errors[$input->name]=$validationClass::get_message($input->conf);
+					continue;
+				}
+			}
+		}
+		if(!empty($this->errors)){
+			throw new MailFormException($this->errors);
+		}
+		$f=$this->get_gc_file();
+		$h=fopen($f,'a');
+		$expire=strtotime('+ 1 hour');
+		foreach($files as $name=>$file){
+			$input=$this->inputs[$name];
+			$fname=uniqid().strtolower(strrchr($file['name'],'.'));
+			$f=\UPLOADS_DIR.'/'.$fname;
+			if(!is_dir($d=dirname($f))){mkdir($d,0755,true);}
+			if(move_uploaded_file($file['tmp_name'],$f)){
+				$files[$name]['tmp_name']=$f;
+				$files[$name]['file_name']=$fname;
+				fputcsv($h,array($fname,$expire));
+			}
+		}
+		fclose($h);
+		$this->reduce_files();
+		return $files;
+	}
+	public function save_file($name){
+		$f=$this->get_gc_file();
+		if(!isset($this->values[$name]['file_name'])){return false;}
+		$fname=$this->values[$name]['file_name'];
+		$remain=array();
+		$h=fopen($f,'r');
+		error_log(var_export($fname,1).__FILE__.':'.__LINE__);
+		while($row=fgetcsv($h)){
+			error_log(var_export($row,1).__FILE__.':'.__LINE__);
+			if($row[0]!==$fname){
+				array_push($remain,$row);
+			}
+		}
+		fclose($h);
+		$h=fopen($f,'w');
+		foreach($remain as $row){
+			fputcsv($h,$row);
+		}
+		return true;
+	}
+	public function reduce_files(){
+		$f=$this->get_gc_file();
+		$h=fopen($f,'r');
+		$remain=array();
+		$has_update=false;
+		while($row=fgetcsv($h)){
+			if($row[1]<time()){
+				$has_update=true;
+				unlink(\UPLOADS_DIR.'/'.$row[0]);
+			}
+			else{
+				array_push($remain,$row);
+			}
+		}
+		fclose($h);
+		if($has_update){
+			$h=fopen($f,'w');
+			foreach($remain as $row){
+				fputcsv($h,$row);
+			}
+		}
+	}
+	public function get_gc_file(){
+		$this->create_log_dir_if_not_exists();
+		$f=\LOG_DIR.'/gc.csv';
+		if(!file_exists($f)){touch($f);chmod($f,0600);}
+		return $f;
+	}
+	
+	public function add_karma($val){
+		if(is_string($val)){
+			$val=isset($this->config['karma']['values'][$val])?$this->config['karma']['values'][$val]:(int)$val;
+		}
+		$this->get_karma()->value+=$val;
+	}
+	public function save_karma(){
+		$karma=$this->get_karma();
+		if(isset($karma->offset)){
+			$h=fopen($this->get_karma_file(),'w');
+			fseek($h,$karma->offset);
+		}
+		else{
+			$h=fopen($this->get_karma_file(),'a');
+		}
+		fputs($h,sprintf(self::$karma_format,$karma->ip,$karma->value,$karma->time));
+	}
+	public function get_karma(){
+		static $karma;
+		if(isset($karma)){return $karma;}
+		$ip=$_SERVER['REMOTE_ADDR'];
+		$h=fopen($this->get_karma_file(),'r');
+		while($line=fgets($h)){
+			sscanf($line,'%s %d %d',$key,$val,$time);
+			if($ip===$key){
+				$threshold=isset($this->config['karma']['threshold'])?$this->config['karma']['threshold']:10000;
+				$karma=(object)array('ip'=>$ip,'value'=>$val,'time'=>$time,'offset'=>ftell($h)-strlen($line),'suspend'=>$val > $threshold);
+				if($karma->suspend){
+					$pardon=isset($this->config['karma']['pardon'])?$this->config['karma']['pardon']:'- 1 day';
+					if(!empty($pardon) && $karma->time < $pardon){
+						$karma->value=0;
+						$karma->time=time();
+					}
+				}
+				else{
+					$recovery=isset($this->config['karma']['recovery'])?$this->config['karma']['recovery']:10;
+					$karma->value-=$recovery*(time()-$time);
+					if($karma->value<0){$karma->value=0;}
+					$karma->time=time();
+				}
+				return $karma;
+			}
+		}
+		return $karma=(object)array('ip'=>$ip,'value'=>0,'time'=>time(),'offset'=>null,'suspend'=>false);
+	}
+	public function check_karma(){
+		return empty($this->get_karma()->suspend);
+	}
+	public function get_karma_file(){
+		$this->create_log_dir_if_not_exists();
+		$f=\LOG_DIR.'/karma.list';
+		if(!file_exists($f)){touch($f);chmod($f,0600);}
+		return $f;
 	}
 	
 	public function get_mailer(){
