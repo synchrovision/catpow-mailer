@@ -4,14 +4,14 @@ import {Portal} from 'component';
 Catpow.UI.UploadMedia=(props)=>{
 	const {useCallback,useState,useMemo,useRef,useEffect}=React;
 	const {createPortal}=ReactDOM;
-	const {className="cmf-ui-uploadmedia",text='Select File'}=props;
+	const {className="cmf-ui-uploadmedia",text='Select File',cmf}=props;
 	const {HiddenValues}=Catpow.Components;
 	const classes=bem(className);
 	
-	const [value,setValue]=useState(props.value || false);
-	const [file,setFile]=useState(false)
+	const [file,setFile]=useState(false);
 	const [previewUrl,setPreviewUrl]=useState(false);
 	const [message,setMessage]=useState(false);
+	const [portalForm,setPortalForm]=useState(false);
 	const [fileInput,setFileInput]=useState(false);
 	
 	const maxFileSizeInt=useMemo(()=>{
@@ -21,31 +21,38 @@ Catpow.UI.UploadMedia=(props)=>{
 	
 	useEffect(()=>{
 		if(!fileInput){return;}
-		const reader=new FileReader();
-		reader.addEventListener('load',(e)=>{
-			setPreviewUrl(reader.result);
-		});
 		fileInput.addEventListener('change',(e)=>{
-			const file=e.currentTarget.files[0];
-			if(file.size>maxFileSizeInt){
-				setMessage('Too large File');
-				setPreviewUrl(false);
-				return;
+			const files=e.currentTarget.files;
+			for(let i=0;i<files.length;i++){
+				if(files[i].size>maxFileSizeInt){
+					setMessage('Too large File');
+					setPreviewUrl(false);
+					return;
+				}
 			}
 			setMessage(false);
-			setFile(file);
-			reader.readAsDataURL(file);
+			const data=new FormData(portalForm);
+			cmf.send(data,function(res){
+				if(res.error){
+					cmf.showError(res.error);
+					cmf.focusAlert();
+					return;
+				}
+				if(res.files && res.files[props.name]){
+					setFile(res.files[props.name]);
+				}
+			});
 		});
-	},[fileInput]);
+	},[portalForm,fileInput]);
 
 	return (
 		<div className={classes()}>
 			<div className={classes.button()} onClick={()=>fileInput.click()}>{text}</div>
 			{message && <div className={classes.message()}>{message}</div>}
-			{previewUrl && (
-				<div className={classes.preview()}>
+			{file && (
+				<div className={classes.preview()} key={file.name}>
 					<div className={classes.preview.images()}>
-						<img className={classes.preview.images.img()} src={previewUrl}/>
+						<img className={classes.preview.images.img()} src={cmf.getFileUrl(props.name)}/>
 					</div>
 					<div className={classes.preview.spec()}>
 						<span className={classes.preview.spec.name()}>{file.name}</span>
@@ -54,12 +61,14 @@ Catpow.UI.UploadMedia=(props)=>{
 				</div>
 			)}
 			<Portal className={classes.portal()}>
-				<input className={classes.portal.input()} type="file" accept={props.accept} ref={setFileInput}/>
+				<form className={classes.portal.form()} ref={setPortalForm}>
+					<input className={classes.portal.input()} type="file" name={props.name} accept={props.accept} ref={setFileInput}/>
+				</form>
 			</Portal>
-			{value && (
+			{file && (
 				<HiddenValues
 					name={props.name}
-					value={value}
+					value={file}
 				/>
 			)}
 		</div>

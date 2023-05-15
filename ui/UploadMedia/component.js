@@ -94,13 +94,13 @@
   Catpow.UI.UploadMedia = (props) => {
     const { useCallback, useState, useMemo: useMemo2, useRef, useEffect } = React;
     const { createPortal } = ReactDOM;
-    const { className = "cmf-ui-uploadmedia", text = "Select File" } = props;
+    const { className = "cmf-ui-uploadmedia", text = "Select File", cmf } = props;
     const { HiddenValues } = Catpow.Components;
     const classes = bem(className);
-    const [value, setValue] = useState(props.value || false);
     const [file, setFile] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(false);
     const [message, setMessage] = useState(false);
+    const [portalForm, setPortalForm] = useState(false);
     const [fileInput, setFileInput] = useState(false);
     const maxFileSizeInt = useMemo2(() => {
       if (!props.filesize) {
@@ -112,27 +112,34 @@
       if (!fileInput) {
         return;
       }
-      const reader = new FileReader();
-      reader.addEventListener("load", (e) => {
-        setPreviewUrl(reader.result);
-      });
       fileInput.addEventListener("change", (e) => {
-        const file2 = e.currentTarget.files[0];
-        if (file2.size > maxFileSizeInt) {
-          setMessage("Too large File");
-          setPreviewUrl(false);
-          return;
+        const files = e.currentTarget.files;
+        for (let i = 0; i < files.length; i++) {
+          if (files[i].size > maxFileSizeInt) {
+            setMessage("Too large File");
+            setPreviewUrl(false);
+            return;
+          }
         }
         setMessage(false);
-        setFile(file2);
-        reader.readAsDataURL(file2);
+        const data = new FormData(portalForm);
+        cmf.send(data, function(res) {
+          if (res.error) {
+            cmf.showError(res.error);
+            cmf.focusAlert();
+            return;
+          }
+          if (res.files && res.files[props.name]) {
+            setFile(res.files[props.name]);
+          }
+        });
       });
-    }, [fileInput]);
-    return /* @__PURE__ */ React.createElement("div", { className: classes() }, /* @__PURE__ */ React.createElement("div", { className: classes.button(), onClick: () => fileInput.click() }, text), message && /* @__PURE__ */ React.createElement("div", { className: classes.message() }, message), previewUrl && /* @__PURE__ */ React.createElement("div", { className: classes.preview() }, /* @__PURE__ */ React.createElement("div", { className: classes.preview.images() }, /* @__PURE__ */ React.createElement("img", { className: classes.preview.images.img(), src: previewUrl })), /* @__PURE__ */ React.createElement("div", { className: classes.preview.spec() }, /* @__PURE__ */ React.createElement("span", { className: classes.preview.spec.name() }, file.name), /* @__PURE__ */ React.createElement("span", { className: classes.preview.spec.size() }, intToDataSizeString(file.size)))), /* @__PURE__ */ React.createElement(Portal, { className: classes.portal() }, /* @__PURE__ */ React.createElement("input", { className: classes.portal.input(), type: "file", accept: props.accept, ref: setFileInput })), value && /* @__PURE__ */ React.createElement(
+    }, [portalForm, fileInput]);
+    return /* @__PURE__ */ React.createElement("div", { className: classes() }, /* @__PURE__ */ React.createElement("div", { className: classes.button(), onClick: () => fileInput.click() }, text), message && /* @__PURE__ */ React.createElement("div", { className: classes.message() }, message), file && /* @__PURE__ */ React.createElement("div", { className: classes.preview(), key: file.name }, /* @__PURE__ */ React.createElement("div", { className: classes.preview.images() }, /* @__PURE__ */ React.createElement("img", { className: classes.preview.images.img(), src: cmf.getFileUrl(props.name) })), /* @__PURE__ */ React.createElement("div", { className: classes.preview.spec() }, /* @__PURE__ */ React.createElement("span", { className: classes.preview.spec.name() }, file.name), /* @__PURE__ */ React.createElement("span", { className: classes.preview.spec.size() }, intToDataSizeString(file.size)))), /* @__PURE__ */ React.createElement(Portal, { className: classes.portal() }, /* @__PURE__ */ React.createElement("form", { className: classes.portal.form(), ref: setPortalForm }, /* @__PURE__ */ React.createElement("input", { className: classes.portal.input(), type: "file", name: props.name, accept: props.accept, ref: setFileInput }))), file && /* @__PURE__ */ React.createElement(
       HiddenValues,
       {
         name: props.name,
-        value
+        value: file
       }
     ));
   };
