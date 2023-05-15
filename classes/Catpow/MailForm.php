@@ -95,11 +95,18 @@ class MailForm{
 				}
 			}
 		}
-		foreach($input->validation as $validation){
-			$validationClass='\\Catpow\\validation\\'.$validation;
-			if(($validationClass::$phase & validation\validation::CONFIRM_PHASE) && !$validationClass::is_valid($this->received[$key],$input)){
-				$this->errors[$input->name]=$validationClass::get_message($input->conf);
-				continue;
+		if(!empty($this->errors)){
+			$this->received=array();
+			throw new MailFormException($this->errors);
+		}
+		foreach($this->received as $key=>$val){
+			$input=$this->inputs[$key];
+			foreach($input->validation as $validation){
+				$validationClass='\\Catpow\\validation\\'.$validation;
+				if(($validationClass::$phase & validation\validation::CONFIRM_PHASE) && !$validationClass::is_valid($this->received[$key],$input)){
+					$this->errors[$input->name]=$validationClass::get_message($input->conf);
+					continue;
+				}
 			}
 		}
 		if(!empty($this->errors)){
