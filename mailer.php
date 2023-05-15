@@ -16,6 +16,20 @@ spl_autoload_register(function($class){
 global $res,$form;
 $form=Catpow\MailForm::get_instance();
 if($_SERVER['REQUEST_METHOD']=='GET'){
+	if(!$form->check_karma()){
+		header('HTTP/1.1 403 Forbidden');
+		die();
+	}
+	if(isset($_GET['render'])){
+		try{
+			preg_match('/(\w+)(?:\[(\w+)\])?/',$_GET['render'],$matches);
+			$form->inputs[$matches[1]]->render(isset($matches[2])?$matches[2]:0);
+		}
+		catch(Throwable $e){
+			header('HTTP/1.1 403 Forbidden');
+		}
+		die();
+	}
 	$form->refresh();
 	header("Content-Type: text/javascript; charset=utf-8");
 	readfile(MAILER_DIR.'/js/script.js');
@@ -26,6 +40,8 @@ if($_SERVER['REQUEST_METHOD']=='GET'){
 $res=new Catpow\REST_Response();
 while(ob_get_level()){
 	if(!empty($maybe_error_message=ob_get_clean())){
+		$form->add_karma(100);
+		$form->save_karma();
 		$res['status']=500;
 		$res['error']=array('@form'=>$maybe_error_message);
 		echo $res;
@@ -33,13 +49,26 @@ while(ob_get_level()){
 	}
 }
 ob_start();
-$action=preg_replace('/\W/','',$_POST['action']);
 try{
 	$form->verify_nonce();
-	$f=FORM_DIR.'/form/'.$action.'.php';
-	if(!file_exists($f)){throw new Exception('Forbidden',403);}
-	include MAILER_DIR.'/functions.php';
-	include $f;
+	if(isset($_POST['action'])){
+		$action=preg_replace('/\W/','',$_POST['action']);
+		$f=FORM_DIR.'/form/'.$action.'.php';
+		if(!file_exists($f)){throw new Exception('Forbidden',403);}
+		include MAILER_DIR.'/functions.php';
+		include $f;
+	}
+	elseif(!empty($_FILES)){
+		$form->reset_errors();
+		$files=$form->receive_files();
+		if(!empty($files)){
+			$form->merge_values($files);
+			$res['files']=$files;
+		}
+	}
+	else{
+		throw new Exception('Forbidden',403);
+	}
 	$res['status']='200';
 	$res['html']=ob_get_clean();
 }
@@ -52,5 +81,7 @@ catch(Throwable $e){
 	$res['status']=$e->getCode();
 	$res['error']=array('@form'=>$e->getMessage());
 }
+$form->add_karma(1);
+$form->save_karma();
 header("Content-Type: application/json; charset=utf-8");
 echo $res;
