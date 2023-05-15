@@ -23,6 +23,10 @@ abstract class input{
 			$this->name,$this->value,$this->attr
 		);
 	}
+	public function render(){
+		header("Content-Type: text/plain; charset=utf-8");
+		echo $this->output();
+	}
 	public function get_log_value(){
 		return $this->form->values[$this->name];
 	}
