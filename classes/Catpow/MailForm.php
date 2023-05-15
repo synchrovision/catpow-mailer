@@ -159,6 +159,17 @@ class MailForm{
 		$this->nonce=bin2hex(openssl_random_pseudo_bytes(8));
 		$this->expire=strtotime(isset($this->config['expire'])?$this->config['expire']:'+ 1 hour');
 	}
+	public function create_log_dir_if_not_exists(){
+		if(!is_dir(\LOG_DIR)){
+			mkdir(\LOG_DIR);
+			util\BasicAuth::create(
+				\LOG_DIR,
+				isset($this->config['user'])?$this->config['user']:'admin',
+				isset($this->config['password'])?$this->config['password']:'password',
+				"AddType application/octet-stream .csv\n"
+			);
+		}
+	}
 	public function put_log(){
 		$f=\FORM_DIR.'/log/log.csv';
 		
@@ -167,15 +178,7 @@ class MailForm{
 			rename($f,substr($f,0,-4).'-'.date('YmdHi',time()).'.csv');
 		}
 		if(!file_exists($f)){
-			if(!is_dir($d=dirname($f))){
-				mkdir($d);
-				util\BasicAuth::create(
-					$d,
-					isset($this->config['user'])?$this->config['user']:'admin',
-					isset($this->config['password'])?$this->config['password']:'password',
-					"AddType application/octet-stream .csv\n"
-				);
-			}
+			$this->create_log_dir_if_not_exists();
 			file_put_contents($f,pack('C*',0xEF,0xBB,0xBF));
 			$h=fopen($f,'a');
 			$labels=array();
