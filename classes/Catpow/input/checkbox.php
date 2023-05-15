@@ -12,6 +12,7 @@ class checkbox extends select{
 	public static function get_input($name,$sels,$vals,$className="cmf-input-checkbox"){
 		$rtn=sprintf('<div class="%s">',$className);
 		if(empty($vals))$vals=array('');
+		$vals=(array)$vals;
 		$item_format=
 			'<label class="%s__item">'.
 			'<input class="%1$s__item-input" type="checkbox" name="%s" value="%s"%s>'.
