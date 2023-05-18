@@ -51,9 +51,9 @@ abstract class input{
 				return $blockClassName;
 			}
 			case 'label':return isset($this->conf['label'])?$this->conf['label']:$this->name;
-			case 'received':return isset($this->form->reserved[$this->name])?$this->form->reserved[$this->name]:'';
+			case 'received':return isset($this->form->recieved[$this->name])?$this->form->recieved[$this->name]:'';
 			case 'value':
-				if(isset($this->form->reserved[$this->name])){return $this->form->reserved[$this->name];}
+				if(isset($this->form->recieved[$this->name])){return $this->form->recieved[$this->name];}
 				if(isset($this->form->values[$this->name])){
 					return $this->form->values[$this->name];
 				}
