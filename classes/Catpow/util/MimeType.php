@@ -3,8 +3,8 @@ namespace Catpow\util;
 class MimeType{
 	public static $mime_types=array(
 		'txt'=>'text/plain',
-		'htm'=>'text/html',
 		'html'=>'text/html',
+		'htm'=>'text/html',
 		'md'=>'text/markdown',
 		'php'=>'text/html',
 		'csv'=>'text/csv',
@@ -17,9 +17,9 @@ class MimeType{
 
 		// images
 		'png'=>'image/png',
-		'jpe'=>'image/jpeg',
-		'jpeg'=>'image/jpeg',
 		'jpg'=>'image/jpeg',
+		'jpeg'=>'image/jpeg',
+		'jpe'=>'image/jpeg',
 		'gif'=>'image/gif',
 		'bmp'=>'image/bmp',
 		'webp'=>'image/webp',
