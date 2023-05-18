@@ -128,6 +128,7 @@ class MailForm{
 		}
 	}
 	public function receive_files($files=null){
+		$this->create_log_dir_if_not_exists();
 		$files=isset($files)?$files:$_FILES;
 		$files=array_intersect_key(array_filter($files,function($file){
 			return !empty($file['tmp_name']);
@@ -151,7 +152,7 @@ class MailForm{
 		foreach($files as $name=>$file){
 			$input=$this->inputs[$name];
 			$fname=uniqid().strtolower(strrchr($file['name'],'.'));
-			$f=\UPLOADS_DIR.'/'.$fname;
+			$f=\TMP_DIR.'/'.$fname;
 			if(!is_dir($d=dirname($f))){mkdir($d,0755,true);}
 			if(move_uploaded_file($file['tmp_name'],$f)){
 				$files[$name]['tmp_name']=$f;
@@ -163,24 +164,11 @@ class MailForm{
 		$this->reduce_files();
 		return $files;
 	}
-	public function save_file($name){
-		$f=$this->get_gc_file();
-		if(!isset($this->values[$name]['file_name'])){return false;}
-		$fname=$this->values[$name]['file_name'];
-		$remain=array();
-		$h=fopen($f,'r');
-		error_log(var_export($fname,1).__FILE__.':'.__LINE__);
-		while($row=fgetcsv($h)){
-			error_log(var_export($row,1).__FILE__.':'.__LINE__);
-			if($row[0]!==$fname){
-				array_push($remain,$row);
-			}
-		}
-		fclose($h);
-		$h=fopen($f,'w');
-		foreach($remain as $row){
-			fputcsv($h,$row);
-		}
+	public function save_file($fname,$save_as=null){
+		$this->create_log_dir_if_not_exists();
+		if(empty($save_as)){$save_as=$fname;}
+		if(!is_dir(\UPLOADS_DIR)){mkdir(\UPLOADS_DIR,0755,true);}
+		copy(\TMP_DIR.'/'.$fname,\UPLOADS_DIR.'/'.$save_as);
 		return true;
 	}
 	public function reduce_files(){
@@ -191,7 +179,9 @@ class MailForm{
 		while($row=fgetcsv($h)){
 			if($row[1]<time()){
 				$has_update=true;
-				unlink(\UPLOADS_DIR.'/'.$row[0]);
+				if(file_exists(\TMP_DIR.'/'.$row[0])){
+					unlink(\TMP_DIR.'/'.$row[0]);
+				}
 			}
 			else{
 				array_push($remain,$row);
@@ -322,6 +312,7 @@ class MailForm{
 		$this->nonce=bin2hex(openssl_random_pseudo_bytes(8));
 		$this->expire=strtotime(isset($this->config['expire'])?$this->config['expire']:'+ 1 hour');
 	}
+	
 	public function create_log_dir_if_not_exists(){
 		if(!is_dir(\LOG_DIR)){
 			mkdir(\LOG_DIR);
@@ -334,6 +325,24 @@ class MailForm{
 		}
 	}
 	public function put_log(){
+		$this->create_log_dir_if_not_exists();
+		$f=\LOG_DIR.'/lastInsertId.txt';
+		if(file_exists($f)){
+			$h=fopen($f,'r+');
+			flock($h,\LOCK_EX);
+			fscanf($h,'%d',$id);
+			$id++;
+			rewind($h);
+		}
+		else{
+			$id=1;
+			$h=fopen($f,'w');
+			flock($h,\LOCK_EX);
+		}
+		fputs($h,$id);
+		fflush($h);
+		flock($h,\LOCK_UN);
+		fclose($h);
 		$f=\LOG_DIR.'/log.csv';
 		
 		$inputs=$this->config['inputs'];
@@ -341,22 +350,25 @@ class MailForm{
 			rename($f,substr($f,0,-4).'-'.date('YmdHi',time()).'.csv');
 		}
 		if(!file_exists($f)){
-			$this->create_log_dir_if_not_exists();
 			file_put_contents($f,pack('C*',0xEF,0xBB,0xBF));
 			$h=fopen($f,'a');
-			$labels=array();
+			flock($h,\LOCK_EX);
+			$labels=array('id');
 			foreach($inputs as $input){$labels[]=$input['label'];}
 			$labels=array_merge($labels,array('ipAddress','DateTime'));
 			fputcsv($h,$labels);
 		}
 		else{
 			$h=fopen($f,'a');
+			flock($h,\LOCK_EX);
 		}
-		$values=array();
+		$values=array($id);
 		foreach($inputs as $name=>$conf){
-			$values[]=$this->inputs[$name]->get_log_value();
+			$values[]=$this->inputs[$name]->get_log_value($id);
 		}
 		fputcsv($h,array_merge($values,array($_SERVER["REMOTE_ADDR"],date("Y/m/d (D) H:i:s",time()))));
+		fflush($h);
+		flock($h,\LOCK_UN);
 		fclose($h);
 	}
 	public static function parse_address($address){

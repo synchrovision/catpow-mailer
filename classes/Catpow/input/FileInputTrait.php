@@ -1,5 +1,6 @@
 <?php
 namespace Catpow\input;
+use Catpow\util\MimeType;
 
 trait FileInputTrait{
 	public function output(){
@@ -8,7 +9,7 @@ trait FileInputTrait{
 	public function render($index=0){
 		if(
 			empty($fname=$this->value['file_name']) || 
-			!file_exists($file=\UPLOADS_DIR.'/'.$fname)
+			!file_exists($file=\TMP_DIR.'/'.$fname)
 		){
 			header("HTTP/1.1 404 Not Found");
 			return;
@@ -44,10 +45,10 @@ trait FileInputTrait{
 				readfile($file);
 		}
 	}
-	public function get_log_value(){
-		$fname=$this->form->values[$this->name]['file_name'];
-		$this->form->save_file($this->name);
-		return $fname;
+	public function get_log_value($id){
+		$save_as=sprintf('%s-%03d.%s',$this->name,$id,MimeType::mime_to_ext($this->value['type']));
+		$this->form->save_file($this->value['file_name'],$save_as);
+		return $save_as;
 	}
 }
 ?>
