@@ -6,8 +6,6 @@ define('MAILER_DIR',__DIR__);
 define('MAILER_URI',dirname($_SERVER['REQUEST_URI']));
 define('FORM_DIR',dirname(__DIR__));
 define('FORM_URI',dirname(MAILER_URI));
-define('LOG_DIR',FORM_DIR.'/log');
-define('UPLOADS_DIR',FORM_DIR.'/log/uploads');
 spl_autoload_register(function($class){
 	$path=str_replace('\\','/',$class);
 	if(file_exists($f=FORM_DIR.'/classes/'.$path.'.php')){include($f);}
@@ -15,6 +13,8 @@ spl_autoload_register(function($class){
 });
 global $res,$form;
 $form=Catpow\MailForm::get_instance();
+define('LOG_DIR',isset($form->config['log_dir'])?$form->config['log_dir']:FROM_DIR.'/log');
+define('UPLOADS_DIR',LOG_DIR.'/uploads');
 if($_SERVER['REQUEST_METHOD']=='GET'){
 	if(!$form->check_karma()){
 		header('HTTP/1.1 403 Forbidden');

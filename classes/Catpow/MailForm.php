@@ -334,7 +334,7 @@ class MailForm{
 		}
 	}
 	public function put_log(){
-		$f=\FORM_DIR.'/log/log.csv';
+		$f=\LOG_DIR.'/log.csv';
 		
 		$inputs=$this->config['inputs'];
 		if(file_exists($f) && filectime($f) < filemtime(\FORM_DIR.'/config.php')){
