@@ -270,6 +270,7 @@ class MailForm{
 			$mailer->Password=$smtp['password'];
 			$mailer->SMTPSecure=isset($smtp['smtpsecure'])?$smtp['smtpsecure']:'ssl';
 			$mailer->Port=isset($smtp['port'])?$smtp['port']:(!empty($mailer->SMTPSecure)?465:25);
+			if(isset($smtp['sender'])){$mailer->Sender=$smtp['sender'];}
 		}
 		$mailer->CharSet="iso-2022-jp";
 		$mailer->Encoding="7bit";
