@@ -264,10 +264,11 @@ class MailForm{
 		if(!empty($this->config['smtp'])){
 			$smtp=$this->config['smtp'];
 			$mailer->isSMTP();
+			$mailer->SMTPAuth=true;
 			$mailer->Host=$smtp['host'];
 			$mailer->Username=$smtp['username'];
 			$mailer->Password=$smtp['password'];
-			$mailer->SMTPSecure=isset($smtp['smtpsecure'])?$smtp['smtpsecure']:'tls';
+			$mailer->SMTPSecure=isset($smtp['smtpsecure'])?$smtp['smtpsecure']:'ssl';
 			$mailer->Port=isset($smtp['port'])?$smtp['port']:(!empty($mailer->SMTPSecure)?465:25);
 		}
 		$mailer->CharSet="iso-2022-jp";
