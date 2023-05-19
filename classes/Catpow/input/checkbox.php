@@ -14,7 +14,7 @@ class checkbox extends select{
 		if(empty($vals))$vals=array('');
 		$vals=(array)$vals;
 		$item_format=
-			'<label class="%s__item">'.
+			'<label class="%s__item%6$s">'.
 			'<input class="%1$s__item-input" type="checkbox" name="%s" value="%s"%s>'.
 			'<span class="%1$s__item-text" for="%1$s">%s</label>'.
 			'</label>';
@@ -26,7 +26,8 @@ class checkbox extends select{
 						$item_format,
 						$className,$name,$ss,
 						in_array($ss,$vals)?' checked="checked"':'',
-						is_int($ii)?$ss:$ii
+						is_int($ii)?$ss:$ii,
+						($ii==='')?' is-bared':''
 					);
 				}
 				$rtn.='</fieldset>';
@@ -36,7 +37,8 @@ class checkbox extends select{
 					$item_format,
 					$className,$name,$s,
 					in_array($s,$vals)?' checked="checked"':'',
-					is_int($i)?$s:$i
+					is_int($i)?$s:$i,
+					($i==='')?' is-bared':''
 				);
 			}
 		}
