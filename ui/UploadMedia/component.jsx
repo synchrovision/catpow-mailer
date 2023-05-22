@@ -11,6 +11,7 @@ Catpow.UI.UploadMedia=(props)=>{
 	const [file,setFile]=useState(false);
 	const [previewUrl,setPreviewUrl]=useState(false);
 	const [message,setMessage]=useState(false);
+	const [root,setRoot]=useState(false);
 	const [portalForm,setPortalForm]=useState(false);
 	const [fileInput,setFileInput]=useState(false);
 	
@@ -40,13 +41,14 @@ Catpow.UI.UploadMedia=(props)=>{
 				}
 				if(res.files && res.files[props.name]){
 					setFile(res.files[props.name]);
+					root.dispatchEvent(e);
 				}
 			});
 		});
-	},[portalForm,fileInput]);
+	},[root,portalForm,fileInput]);
 
 	return (
-		<div className={classes()}>
+		<div className={classes()} ref={setRoot}>
 			<div className={classes.button()} onClick={()=>fileInput.click()}>{text}</div>
 			{message && <div className={classes.message()}>{message}</div>}
 			{file && (

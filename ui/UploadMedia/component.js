@@ -100,6 +100,7 @@
     const [file, setFile] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(false);
     const [message, setMessage] = useState(false);
+    const [root, setRoot] = useState(false);
     const [portalForm, setPortalForm] = useState(false);
     const [fileInput, setFileInput] = useState(false);
     const maxFileSizeInt = useMemo2(() => {
@@ -131,11 +132,12 @@
           }
           if (res.files && res.files[props.name]) {
             setFile(res.files[props.name]);
+            root.dispatchEvent(e);
           }
         });
       });
-    }, [portalForm, fileInput]);
-    return /* @__PURE__ */ React.createElement("div", { className: classes() }, /* @__PURE__ */ React.createElement("div", { className: classes.button(), onClick: () => fileInput.click() }, text), message && /* @__PURE__ */ React.createElement("div", { className: classes.message() }, message), file && /* @__PURE__ */ React.createElement("div", { className: classes.preview(), key: file.name }, /* @__PURE__ */ React.createElement("div", { className: classes.preview.images() }, /* @__PURE__ */ React.createElement("img", { className: classes.preview.images.img(), src: cmf.getFileUrl(props.name) })), /* @__PURE__ */ React.createElement("div", { className: classes.preview.spec() }, /* @__PURE__ */ React.createElement("span", { className: classes.preview.spec.name() }, file.name), /* @__PURE__ */ React.createElement("span", { className: classes.preview.spec.size() }, intToDataSizeString(file.size)))), /* @__PURE__ */ React.createElement(Portal, { className: classes.portal() }, /* @__PURE__ */ React.createElement("form", { className: classes.portal.form(), ref: setPortalForm }, /* @__PURE__ */ React.createElement("input", { className: classes.portal.input(), type: "file", name: props.name, accept: props.accept, ref: setFileInput }))), file && /* @__PURE__ */ React.createElement(
+    }, [root, portalForm, fileInput]);
+    return /* @__PURE__ */ React.createElement("div", { className: classes(), ref: setRoot }, /* @__PURE__ */ React.createElement("div", { className: classes.button(), onClick: () => fileInput.click() }, text), message && /* @__PURE__ */ React.createElement("div", { className: classes.message() }, message), file && /* @__PURE__ */ React.createElement("div", { className: classes.preview(), key: file.name }, /* @__PURE__ */ React.createElement("div", { className: classes.preview.images() }, /* @__PURE__ */ React.createElement("img", { className: classes.preview.images.img(), src: cmf.getFileUrl(props.name) })), /* @__PURE__ */ React.createElement("div", { className: classes.preview.spec() }, /* @__PURE__ */ React.createElement("span", { className: classes.preview.spec.name() }, file.name), /* @__PURE__ */ React.createElement("span", { className: classes.preview.spec.size() }, intToDataSizeString(file.size)))), /* @__PURE__ */ React.createElement(Portal, { className: classes.portal() }, /* @__PURE__ */ React.createElement("form", { className: classes.portal.form(), ref: setPortalForm }, /* @__PURE__ */ React.createElement("input", { className: classes.portal.input(), type: "file", name: props.name, accept: props.accept, ref: setFileInput }))), file && /* @__PURE__ */ React.createElement(
       HiddenValues,
       {
         name: props.name,
