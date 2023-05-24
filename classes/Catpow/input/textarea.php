@@ -15,5 +15,8 @@ class textarea extends input{
 			$this->className,$this->name,$this->attr,$this->value
 		);
 	}
+	public function reflect_to_log(&$log){
+		$log[$this->conf['label']]=htmlspecialchars_decode($this->form->values[$this->name]);
+	}
 }
 ?>

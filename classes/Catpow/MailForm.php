@@ -349,7 +349,10 @@ class MailForm{
 		fclose($h);
 		$f=\LOG_DIR.'/log.csv';
 		
-		$inputs=$this->config['inputs'];
+		$log=array('id'=>$id,'ipAddress'=>$_SERVER["REMOTE_ADDR"],'DateTime'=>date("Y/m/d (D) H:i:s",time()));
+		foreach($this->config['inputs'] as $name=>$conf){
+			$this->inputs[$name]->reflect_to_log($log);
+		}
 		if(file_exists($f) && filectime($f) < filemtime(\FORM_DIR.'/config.php')){
 			rename($f,substr($f,0,-4).'-'.date('YmdHi',time()).'.csv');
 		}
@@ -357,20 +360,13 @@ class MailForm{
 			file_put_contents($f,pack('C*',0xEF,0xBB,0xBF));
 			$h=fopen($f,'a');
 			flock($h,\LOCK_EX);
-			$labels=array('id');
-			foreach($inputs as $input){$labels[]=$input['label'];}
-			$labels=array_merge($labels,array('ipAddress','DateTime'));
-			fputcsv($h,$labels);
+			fputcsv($h,array_keys($log));
 		}
 		else{
 			$h=fopen($f,'a');
 			flock($h,\LOCK_EX);
 		}
-		$values=array($id);
-		foreach($inputs as $name=>$conf){
-			$values[]=$this->inputs[$name]->get_log_value($id);
-		}
-		fputcsv($h,array_merge($values,array($_SERVER["REMOTE_ADDR"],date("Y/m/d (D) H:i:s",time()))));
+		fputcsv($h,array_values($log));
 		fflush($h);
 		flock($h,\LOCK_UN);
 		fclose($h);

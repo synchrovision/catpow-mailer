@@ -27,8 +27,9 @@ abstract class input{
 		header("Content-Type: text/plain; charset=utf-8");
 		echo $this->output();
 	}
-	public function get_log_value($id){
-		return $this->form->values[$this->name];
+	
+	public function reflect_to_log(&$log){
+		$log[$this->conf['label']]=$this->form->values[$this->name];
 	}
 	
 	public function __get($name){

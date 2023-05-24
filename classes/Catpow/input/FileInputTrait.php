@@ -45,9 +45,13 @@ trait FileInputTrait{
 				readfile($file);
 		}
 	}
-	public function get_log_value($id){
-		$save_as=sprintf('%s-%03d.%s',$this->name,$id,MimeType::mime_to_ext($this->value['type']));
+	public function reflect_to_log(&$log){
+		$save_as=sprintf('%s-%03d.%s',$this->name,$log['id'],MimeType::mime_to_ext($this->value['type']));
 		$this->form->save_file($this->value['file_name'],$save_as);
+		$log[$this->conf['label']]=$save_as;
+		$log[$this->conf['label'].' type']=$this->value['type'];
+		$log[$this->conf['label'].' size']=$this->value['size'];
+		$log[$this->conf['label'].' name']=htmlspecialchars($this->value['name']);
 		return $save_as;
 	}
 }
