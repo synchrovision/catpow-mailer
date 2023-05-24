@@ -295,8 +295,14 @@ class MailForm{
 			call_user_func_array(array($mailer,'addAddress'),self::parse_address($toAddress));
 		}
 		$mailer->Subject=mb_encode_mimeheader(isset($subject)?$subject:$defaultHeaders['subject']);
-		if(!empty($isHTML)){$mailer->isHTML(true);}
-		$mailer->Body=ob_get_clean();
+		if(!empty($isHTML)){
+			$mailer->isHTML(true);
+			$mailer->Body=ob_get_clean();
+		}
+		else{
+			$mailer->Body=mb_convert_encoding(ob_get_clean(),'ISO-2022-JP');
+		}
+		
 		if(file_exists($f=\FORM_DIR.'/mail/'.$mail.'-alt.php')){
 			ob_start();
 			include $f;
