@@ -16,6 +16,9 @@ abstract class input{
 	public function output(){
 		return $this->value;
 	}
+	public function output_as_text(){
+		return $this->value;
+	}
 	public function input(){
 		return sprintf(
 			'<input class="%s" type="%s" name="%s" value="%s"%s/>',
@@ -29,7 +32,7 @@ abstract class input{
 	}
 	
 	public function reflect_to_log(&$log){
-		$log[$this->conf['label']]=$this->form->values[$this->name];
+		$log[$this->conf['label']]=$this->output_as_text();
 	}
 	
 	public function __get($name){

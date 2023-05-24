@@ -40,6 +40,12 @@ class MailForm{
 		if(isset($this->config['inputs'][$name]['default'])){return $this->config['inputs'][$name]['default'];}
 		return '';
 	}
+	public function output_as_text($name){
+		if(isset($this->values[$name])){return $this->inputs[$name]->output_as_text();}
+		if(isset($this->config['inputs'][$name]['default_text'])){return $this->config['inputs'][$name]['default_text'];}
+		return '';
+	}
+	
 	public function button($label,$action,$class='secondary'){
 		$this->allow_action($action);
 		return sprintf('<div class="cmf-button %s" data-action="%s">%s</div>',$class,$action,$label);

@@ -1,7 +1,7 @@
 <?php
 namespace Catpow\input;
 
-class textarea extends input{
+class textarea extends text{
 	public static
 		$validation=array('text'),
 		$default_attr=array('placeholder'=>null,'rows'=>null,'cols'=>null,'autocomplete'=>null,'pattern'=>null);
@@ -14,9 +14,6 @@ class textarea extends input{
 			'<textarea class="%s" name="%s"%s>%s</textarea>',
 			$this->className,$this->name,$this->attr,$this->value
 		);
-	}
-	public function reflect_to_log(&$log){
-		$log[$this->conf['label']]=htmlspecialchars_decode($this->form->values[$this->name]);
 	}
 }
 ?>

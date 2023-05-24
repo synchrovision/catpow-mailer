@@ -6,6 +6,9 @@ trait FileInputTrait{
 	public function output(){
 		return htmlspecialchars($this->value['name']);
 	}
+	public function output_as_text(){
+		return $this->value['name'];
+	}
 	public function render($index=0){
 		if(
 			empty($fname=$this->value['file_name']) || 
