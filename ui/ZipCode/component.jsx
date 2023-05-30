@@ -42,8 +42,8 @@
 				setIsComposing(true);
 			}}
 			onCompositionEnd={(e)=>{
-				setIsComposing(false);
 				setSec(i,e.target.value,isComposing);
+				setIsComposing(false);
 			}}
 			ref={refs[i]}
 			value={secs[i]}
