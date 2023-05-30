@@ -8,9 +8,11 @@
 	const secs=value.split('-').slice(0,2);
 
 	const setSec=useCallback((i,val,isComposing)=>{
-		if(!val.match(/^\d+$/)){val='';}
-		if(val.length==7){
-			setValue(val.substring(0,3)+'-'+val.substring(3));
+		if(!val.match(/^[\d\-]+$/)){val='';}
+		const matches=val.match(/^(\d{3})\-?(\d{4})$/);
+		if(matches){
+			secs[0]=matches[1];
+			secs[1]=matches[2];
 		}
 		else{
 			secs[i]=val;
@@ -19,8 +21,8 @@
 					refs[1].current.focus();
 				}
 			}
-			setValue(secs.join('-'));
 		}
+		setValue(secs.join('-'));
 	},[]);
 	useEffect(()=>{
 		if(undefined === window.AjaxZip3){return;}

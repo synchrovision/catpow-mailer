@@ -9,11 +9,13 @@
     const [isComposing, setIsComposing] = useState(false);
     const secs = value.split("-").slice(0, 2);
     const setSec = useCallback((i, val, isComposing2) => {
-      if (!val.match(/^\d+$/)) {
+      if (!val.match(/^[\d\-]+$/)) {
         val = "";
       }
-      if (val.length == 7) {
-        setValue(val.substring(0, 3) + "-" + val.substring(3));
+      const matches = val.match(/^(\d{3})\-?(\d{4})$/);
+      if (matches) {
+        secs[0] = matches[1];
+        secs[1] = matches[2];
       } else {
         secs[i] = val;
         if (i == 0 && val.length > 2) {
@@ -21,8 +23,8 @@
             refs[1].current.focus();
           }
         }
-        setValue(secs.join("-"));
       }
+      setValue(secs.join("-"));
     }, []);
     useEffect(() => {
       if (void 0 === window.AjaxZip3) {
