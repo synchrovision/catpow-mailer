@@ -13,7 +13,7 @@ spl_autoload_register(function($class){
 });
 global $res,$form;
 $form=Catpow\MailForm::get_instance();
-define('LOG_DIR',isset($form->config['log_dir'])?$form->config['log_dir']:FROM_DIR.'/log');
+define('LOG_DIR',isset($form->config['log_dir'])?$form->config['log_dir']:FORM_DIR.'/log');
 define('TMP_DIR',LOG_DIR.'/tmp');
 define('UPLOADS_DIR',LOG_DIR.'/uploads');
 if($_SERVER['REQUEST_METHOD']=='GET'){
