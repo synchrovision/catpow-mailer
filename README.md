@@ -5,20 +5,53 @@ Catpow Mailer
   <img src="https://img.shields.io/badge/PHP-5.4-45A?logo=php">
 </p>
 
-Ajax×APIのメールフォームのためのライブラリ。
-Nonceや入力検証などメールフォームに必要なAPIを提供します。
+入力ステップの追加・分岐や、入力タイプ・入力検証の拡張の仕組みを備える、柔軟で拡張性の高い、中・上級者向けPHPのメールフォームです。
+Ajaxでページを遷移せずに動作します。
 
-Catpow-Mailformにてサブモジュールとして利用されます。
-このリポジトリは直接クローンされることを想定しません。
-Catpow-Mailformのテンプレートリポジトリをクローンしてください。
-
-概要
+使い方
 --
 
-``mailer.php``にリクエストを投げることで各種処理を行います。
-リクエストの``action``に対応した``form``フォルダ内のファイルを実行するのが
-Catpow mailer APIの基本動作となります。
-各ファイル・ディレクトリの役割は以下の通りです。
+### インストール
+
+サイトのディレクトリに移動してこのリポジトリを任意の空ディレクトリにクローン、またはサブモジュールとして追加します。
+
+
+リポジトリをクローン
+ ```command
+git clone --recursive https://github.com/synchrovision/catpow-mailer.git mailform/mailer
+ ```
+
+サブモジュールとして追加
+ ```command
+git submodule add https://github.com/synchrovision/catpow-mailer.git mailform/mailer
+ ```
+
+### セットアップ
+
+setup.phpを実行して、各種設定ファイルをインストールしたディレクトリに生成します。
+
+```command
+php mailform/mailer/setup.php
+```
+
+### 設定
+
+生成された各種設定ファイルを書き換えて、フォームの送信先・入力項目、入力画面・確認画面・送信画面、メールの文面等の設定を行います。
+
+### 配置
+
+メールフォームを配置したい場所に埋め込み用のhtmlを挿入します。
+ディレクトリ名は適宜変更してください。
+
+```html
+<form class="cmf-form"></form>
+<script src="mailform/mailer/mailer.php"></script>
+<link rel="stylesheet" href="mailform/css/theme-standard.css"/>
+```
+
+
+設定概要
+--
 
 ### config.php
 
@@ -28,7 +61,8 @@ Catpow mailer APIの基本動作となります。
 ### form
 
 APIの各actionに対応した処理のファイルを置くフォルダです。
-当該の実行ファイル内では``Catpow\MailForm``クラスのインスタンスである
+フォーム読み込み時、最初にこのフォルダ内の``init.php``が実行されます。
+フォームからのリクエストによる各ファイルの実行時は``Catpow\MailForm``クラスのインスタンスである
 ``$form``が定義されており、このオブジェクトの各メソッド用いて
 入力検証、メール送信等の処理を実行します。
 ``Catpow\REST_Response``クラスのインスタンスである
