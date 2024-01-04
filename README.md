@@ -11,7 +11,7 @@ Ajaxでページを遷移せずに動作します。
 使い方
 --
 
-### インストール
+### 1. インストール
 
 サイトのディレクトリに移動してこのリポジトリを任意の空ディレクトリにクローン、またはサブモジュールとして追加します。
 
@@ -26,7 +26,7 @@ git clone --recursive https://github.com/synchrovision/catpow-mailer.git mailfor
 git submodule add https://github.com/synchrovision/catpow-mailer.git mailform/mailer
  ```
 
-### セットアップ
+### 2. セットアップ
 
 setup.phpを実行して、各種設定ファイルをインストールしたディレクトリに生成します。
 
@@ -34,11 +34,12 @@ setup.phpを実行して、各種設定ファイルをインストールした�
 php mailform/mailer/setup.php
 ```
 
-### 設定
+### 3. 設定
 
-生成された各種設定ファイルを書き換えて、フォームの送信先・入力項目、入力画面・確認画面・送信画面、メールの文面等の設定を行います。
+生成された各種設定ファイルを書き換えて、フォームの送信先・入力項目、入力画面・確認画面・送信画面、メールの文面等の設定を行います。  
+設定内容・設定方法については、[設定概要](#config-summary)を参照ください。
 
-### 配置
+### 4. 配置
 
 メールフォームを配置したい場所に埋め込み用のhtmlを挿入します。
 ディレクトリ名は適宜変更してください。
@@ -50,7 +51,7 @@ php mailform/mailer/setup.php
 ```
 
 
-設定概要
+設定概要<a id="config-summary"></a>
 --
 
 ### config.php
