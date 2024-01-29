@@ -18,12 +18,12 @@ Ajaxでページを遷移せずに動作します。
 
 リポジトリをクローン
  ```command
-git clone --recursive https://github.com/synchrovision/catpow-mailer.git mailform/mailer
+git clone --recursive https://github.com/cpprj/catpow-mailer.git mailform/mailer
  ```
 
 サブモジュールとして追加
  ```command
-git submodule add https://github.com/synchrovision/catpow-mailer.git mailform/mailer
+git submodule add https://github.com/cpprj/catpow-mailer.git mailform/mailer
  ```
 
 ### 2. セットアップ
