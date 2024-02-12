@@ -9,7 +9,7 @@ class select extends input{
 			'<select class="cmf-input-select" name="%s"%s>',
 			$this->name,$this->attr
 		);
-		$rtn.=sprintf('<option value="">%s</option>',isset($conf['defaultLabel'])?$conf['defaultLabel']:'---');
+		$rtn.=sprintf('<option value="">%s</option>',isset($this->conf['defaultLabel'])?$this->conf['defaultLabel']:'---');
 		foreach(static::get_selections($this) as $i=>$s){
 			if(is_array($s)){
 				$rtn.=sprintf('<optgroup label="%s">',$i);
