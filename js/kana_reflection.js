@@ -36,6 +36,5 @@ kana_reflection.setup=function(){
 			});
 		});
 	});
-}
-document.addEventListener('DOMContentLoaded',kana_reflection.setup);
-window.addEventListener('load',kana_reflection.setup);
+};
+(cb=>document.readyState!=='loading'?cb():document.addEventListener('DOMContentLoaded',cb))(kana_reflection.setup);

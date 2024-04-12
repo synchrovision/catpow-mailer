@@ -40,7 +40,9 @@ if($_SERVER['REQUEST_METHOD']=='GET'){
 }
 $res=new Catpow\REST_Response();
 while(ob_get_level()){
-	if(!empty($maybe_error_message=ob_get_clean())){
+	break;
+	$maybe_error_message=ob_get_clean();
+	if(!empty($maybe_error_message)){
 		$form->add_karma(100);
 		$form->save_karma();
 		$res['status']=500;
