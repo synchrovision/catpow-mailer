@@ -2,7 +2,7 @@
 if(php_sapi_name()!=='cli'){die('This program should be executed with CLI');}
 chdir(__DIR__);
 echo "download Mail Form\n";
-$ch=curl_init('https://github.com/cpprj/catpow-mailform/archive/refs/heads/master.zip');
+$ch=curl_init('https://github.com/synchrovision/catpow-mailform/archive/refs/heads/master.zip');
 $f='tmp.zip';
 $fp=fopen($f,'w');
 curl_setopt($ch,CURLOPT_FAILONERROR,true);
