@@ -1,7 +1,7 @@
 <?php
 namespace Catpow\input;
 
-class fax extends text{
+class fax extends tel{
 	
 	public function output(){
 		$val=$this->value;
