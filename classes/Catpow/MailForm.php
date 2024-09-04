@@ -4,6 +4,7 @@ use PHPMailer;
 
 class MailForm{
 	public static $karma_format="%-20s %10d %12d\n";
+	private $id=null,$timer=array();
 	public $nonce,$created,$expire,$inputs=array(),$allowed_actions=array(),$allowed_inputs=array(),$agreements=array(),$config,$values=array(),$received=array(),$errors=array();
 	public function __construct(){
 		include \FORM_DIR.'/config.php';
@@ -320,6 +321,7 @@ class MailForm{
 		$this->clear();
 		$this->values=array();
 		$this->received=array();
+		$this->timer=array();
 	}
 	public function verify_nonce(){
 		if($this->nonce!==$_SERVER['HTTP_X_CMF_NONCE']){throw new \Exception('Forbidden',403);};
@@ -327,6 +329,7 @@ class MailForm{
 	public function refresh(){
 		$this->nonce=bin2hex(openssl_random_pseudo_bytes(8));
 		$this->expire=strtotime(isset($this->config['expire'])?$this->config['expire']:'+ 1 hour');
+		$this->timer=array();
 	}
 	
 	public function create_log_dir_if_not_exists(){
@@ -342,23 +345,7 @@ class MailForm{
 	}
 	public function put_log(){
 		$this->create_log_dir_if_not_exists();
-		$f=\LOG_DIR.'/lastInsertId.txt';
-		if(file_exists($f)){
-			$h=fopen($f,'r+');
-			flock($h,\LOCK_EX);
-			fscanf($h,'%d',$id);
-			$id++;
-			rewind($h);
-		}
-		else{
-			$id=1;
-			$h=fopen($f,'w');
-			flock($h,\LOCK_EX);
-		}
-		fputs($h,$id);
-		fflush($h);
-		flock($h,\LOCK_UN);
-		fclose($h);
+		$id=$this->get_id();
 		$f=\LOG_DIR.'/log.csv';
 		
 		$log=array('id'=>$id,'ipAddress'=>$_SERVER["REMOTE_ADDR"],'DateTime'=>date("Y/m/d (D) H:i:s",time()));
@@ -383,6 +370,47 @@ class MailForm{
 		flock($h,\LOCK_UN);
 		fclose($h);
 	}
+	public function get_id(){
+		if(isset($this->id)){return $this->id;}
+		$this->create_log_dir_if_not_exists();
+		$f=\LOG_DIR.'/lastInsertId.txt';
+		if(file_exists($f)){
+			$h=fopen($f,'r+');
+			flock($h,\LOCK_EX);
+			fscanf($h,'%d',$this->id);
+			$this->id++;
+			rewind($h);
+		}
+		else{
+			$this->id=1;
+			$h=fopen($f,'w');
+			flock($h,\LOCK_EX);
+		}
+		fputs($h,$this->id);
+		fflush($h);
+		flock($h,\LOCK_UN);
+		fclose($h);
+		return $this->id;
+	}
+	
+	public function start_timer($name){
+		if(isset($this->timer[$name]) && count($this->timer[$name])&1){return;}
+		$this->timer[$name][]=time();
+	}
+	public function stop_timer($name){
+		if(isset($this->timer[$name]) && count($this->timer[$name])&1){
+			$this->timer[$name][]=time();
+		}
+	}
+	public function get_timer_result($name){
+		if(is_null($this->timer[$name])){return 0;}
+		$value=0;
+		for($i=0,$l=count($this->timer[$name]);$i<$l;$i+=2){
+			$value+=($this->timer[$name][$i+1]??time())-$this->timer[$name][$i];
+		}
+		return $value;
+	}
+	
 	public static function parse_address($address){
 		if(preg_match('/^(?P<name>.+)<(?P<email>.+@.+)>$/u',$address,$matches)){
 			return array($matches['email'],mb_encode_mimeheader($matches['name']));
