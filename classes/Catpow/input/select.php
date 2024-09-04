@@ -26,9 +26,9 @@ class select extends input{
 	}
 	public static function get_selections($input){
 		$rtn=$input->conf['value'];
-		if(isset($meta->conf['addition'])){
-			if(is_array($meta->conf['addition'])){$rtn=array_merge($rtn,$meta->conf['addition']);}
-			else{$rtn[$meta->conf['addition']]=0;}
+		if(isset($input->conf['addition'])){
+			if(is_array($input->conf['addition'])){$rtn=array_merge($rtn,$input->conf['addition']);}
+			else{$rtn[$input->conf['addition']]=0;}
 		}
 		return $rtn;
 	}
