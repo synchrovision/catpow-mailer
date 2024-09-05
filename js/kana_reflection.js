@@ -12,8 +12,8 @@ function kana_reflection(from,to,isHiragana=false){
 		}
 		else if(e.key == 'Backspace'){
 			to.value=to.value.slice(0,-1);
+			if(from.value==""){to.value="";}
 		}
-		if(from.value==""){to.value="";}
 	});
 }
 
