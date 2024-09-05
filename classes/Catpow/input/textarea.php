@@ -3,6 +3,7 @@ namespace Catpow\input;
 
 class textarea extends text{
 	public static
+		$inline=false,
 		$validation=array('text'),
 		$default_attr=array('placeholder'=>null,'rows'=>null,'cols'=>null,'autocomplete'=>null,'pattern'=>null);
 	

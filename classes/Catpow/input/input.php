@@ -4,6 +4,7 @@ abstract class input{
 	public static
 		$input_type=null,
 		$output_type=null,
+		$inline=true,
 		$validation=array(),
 		$default_attr=array('placeholder'=>null,'size'=>null,'maxlength'=>null,'autocomplete'=>null,'min'=>null,'max'=>null,'step'=>null,'pattern'=>null);
 	public $name,$conf,$form;
@@ -40,7 +41,7 @@ abstract class input{
 			case 'type':return isset(static::$input_type)?static::$input_type:$this->conf['type'];
 			case 'className':return sprintf('cmf-input-%s',$this->type);
 			case 'blockClassName':{
-				$blockClassName=sprintf('is-type-%s',$this->type);
+				$blockClassName=sprintf('is-type-%s is-%s',$this->type,($this->conf['inline']??static::$inline)?'inline':'block');
 				if(is_a($this,'\Catpow\input\text')){
 					$blockClassName.=' is-text-input';
 					if(!empty($this->conf['size'])){$blockClassName.=' has-size';}
