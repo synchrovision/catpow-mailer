@@ -11,6 +11,20 @@ class validation{
 	public static $message_keys=array('label'),$phase=self::INPUT_PHASE;
 	
 	public static function is_valid(&$val,$input){return true;}
+	public static function get_karma($val,$input){
+		if(is_string($val)){
+			if(
+				preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/',$val) ||
+				preg_match('/<script/',$val)
+			){
+				return 'danger_input';
+			}
+			if(preg_match('@(<script|://|\\|"|\')@',$val)){
+				return 'doubt_input';
+			}
+		}
+		return 0;
+	}
 	
 	public static function get_message_format($conf){
 		return __('%sの入力が正しくありません');
