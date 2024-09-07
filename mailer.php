@@ -8,7 +8,7 @@ define('FORM_DIR',dirname(__DIR__));
 define('FORM_URI',dirname(MAILER_URI));
 global $res,$form;
 $form=Catpow\MailForm::get_instance();
-define('LOG_DIR',isset($form->config['log_dir'])?$form->config['log_dir']:FORM_DIR.'/log');
+define('LOG_DIR',isset($form->config['log']['dir'])?$form->config['log']['dir']:FORM_DIR.'/log');
 define('TMP_DIR',LOG_DIR.'/tmp');
 define('UPLOADS_DIR',LOG_DIR.'/uploads');
 if($_SERVER['REQUEST_METHOD']=='GET'){
