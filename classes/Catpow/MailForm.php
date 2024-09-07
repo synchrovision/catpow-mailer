@@ -1,9 +1,23 @@
 <?php
 namespace Catpow;
-use PHPMailer;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class MailForm{
-	public static $karma_format="%-20s %10d %12d\n";
+	public static
+		$karma_format="%-20s %10d %12d\n",
+		$default_karma_settings=array(
+			'recovery'=>100,
+			'thredshold'=>1000,
+			'values'=>array(
+				'send_mail'=>10,
+				'put_log'=>10,
+				'doubt_input'=>10,
+				'danger_input'=>500,
+				'file_upload'=>50,
+				'heavy_file_upload'=>200,
+				'danger_file_upload'=>500
+			)
+		);
 	private $id=null,$timer=array();
 	public $nonce,$created,$expire,$inputs=array(),$allowed_actions=array(),$allowed_inputs=array(),$agreements=array(),$config,$values=array(),$received=array(),$errors=array();
 	public function __construct(){
@@ -96,9 +110,12 @@ class MailForm{
 			}
 			foreach($input->validation as $validation){
 				$validationClass='\\Catpow\\validation\\'.$validation;
-				if(($validationClass::$phase & validation\validation::INPUT_PHASE) && !$validationClass::is_valid($this->received[$key],$input)){
-					$this->errors[$input->name]=$validationClass::get_message($input->conf);
-					continue;
+				if(($validationClass::$phase & validation\validation::INPUT_PHASE)){
+					$this->add_karma($validationClass::get_karma($val,$input));
+					if(!$validationClass::is_valid($this->received[$key],$input)){
+						$this->errors[$input->name]=$validationClass::get_message($input->conf);
+						continue;
+					}
 				}
 			}
 		}
@@ -110,9 +127,12 @@ class MailForm{
 			$input=$this->inputs[$key];
 			foreach($input->validation as $validation){
 				$validationClass='\\Catpow\\validation\\'.$validation;
-				if(($validationClass::$phase & validation\validation::CONFIRM_PHASE) && !$validationClass::is_valid($this->received[$key],$input)){
-					$this->errors[$input->name]=$validationClass::get_message($input->conf);
-					continue;
+				if(($validationClass::$phase & validation\validation::CONFIRM_PHASE)){
+					$this->add_karma($validationClass::get_karma($val,$input));
+					if(!$validationClass::is_valid($this->received[$key],$input)){
+						$this->errors[$input->name]=$validationClass::get_message($input->conf);
+						continue;
+					}
 				}
 			}
 		}
@@ -144,9 +164,12 @@ class MailForm{
 			$input=$this->inputs[$name];
 			foreach($input->validation as $validation){
 				$validationClass='\\Catpow\\validation\\'.$validation;
-				if(($validationClass::$phase & validation\validation::UPLOAD_PHASE) && !$validationClass::is_valid($file,$input)){
-					$this->errors[$input->name]=$validationClass::get_message($input->conf);
-					continue;
+				if(($validationClass::$phase & validation\validation::UPLOAD_PHASE)){
+					$this->add_karma($validationClass::get_karma($file,$input));
+					if(!$validationClass::is_valid($file,$input)){
+						$this->errors[$input->name]=$validationClass::get_message($input->conf);
+						continue;
+					}
 				}
 			}
 		}
@@ -210,10 +233,17 @@ class MailForm{
 	}
 	
 	public function add_karma($val){
-		if(is_string($val)){
-			$val=isset($this->config['karma']['values'][$val])?$this->config['karma']['values'][$val]:(int)$val;
+		$this->get_karma()->value+=$this->get_karma_value($val);
+	}
+	public function get_karma_value($name){
+		if(is_numeric($name)){return (int)$name;}
+		if(isset($this->config['karma']['values'][$name])){
+			return $this->config['karma']['values'][$name];
 		}
-		$this->get_karma()->value+=$val;
+		elseif(isset(self::$default_karma_settings['values'][$name])){
+			return self::$default_karma_settings['values'][$name];
+		}
+		return 0;
 	}
 	public function save_karma(){
 		$karma=$this->get_karma();
@@ -237,15 +267,17 @@ class MailForm{
 				$threshold=isset($this->config['karma']['threshold'])?$this->config['karma']['threshold']:10000;
 				$karma=(object)array('ip'=>$ip,'value'=>$val,'time'=>$time,'offset'=>ftell($h)-strlen($line),'suspend'=>$val > $threshold);
 				if($karma->suspend){
-					$pardon=isset($this->config['karma']['pardon'])?$this->config['karma']['pardon']:'- 1 day';
-					if(!empty($pardon) && $karma->time < $pardon){
+					$pardon=isset($this->config['karma']['pardon'])?$this->config['karma']['pardon']:'1 day';
+					$date=new \DateTime('now');
+					$date->sub(\DateInterval::createFromDateString($pardon));
+					if($karma->time < $date->getTimestamp()){
 						$karma->value=0;
 						$karma->time=time();
 					}
 				}
 				else{
-					$recovery=isset($this->config['karma']['recovery'])?$this->config['karma']['recovery']:10;
-					$karma->value-=$recovery*(time()-$time);
+					$recovery=isset($this->config['karma']['recovery'])?$this->config['karma']['recovery']:1000;
+					$karma->value-=$recovery*(time()-$time)/86400;
 					if($karma->value<0){$karma->value=0;}
 					$karma->time=time();
 				}
@@ -310,6 +342,7 @@ class MailForm{
 			$mailer->AltBody=ob_get_clean();
 		}
 		$mailer->send();
+		$this->add_karma('send_mail');
 	}
 	
 	public function clear(){
@@ -369,6 +402,7 @@ class MailForm{
 		fflush($h);
 		flock($h,\LOCK_UN);
 		fclose($h);
+		$this->add_karma('put_log');
 	}
 	public function get_id(){
 		if(isset($this->id)){return $this->id;}
@@ -393,7 +427,8 @@ class MailForm{
 		return $this->id;
 	}
 	
-	public function start_timer($name){
+	public function start_timer($name,$exclusive=false){
+		if($exclusive){$this->stop_all_timer();}
 		if(isset($this->timer[$name]) && count($this->timer[$name])&1){return;}
 		$this->timer[$name][]=time();
 	}
@@ -402,12 +437,22 @@ class MailForm{
 			$this->timer[$name][]=time();
 		}
 	}
+	public function stop_all_timer(){
+		foreach($this->timer as $name=>$times){
+			if(count($times)&1){$this->timer[$name][]=time();}
+		}
+	}
 	public function get_timer_result($name){
 		if(is_null($this->timer[$name])){return 0;}
 		$value=0;
 		for($i=0,$l=count($this->timer[$name]);$i<$l;$i+=2){
 			$value+=($this->timer[$name][$i+1]??time())-$this->timer[$name][$i];
 		}
+		return $value;
+	}
+	public function get_timer_result_total(){
+		$value=0;
+		foreach($this->timer as $name=>$times){$value+=$this->get_timer_result($name);}
 		return $value;
 	}
 	
