@@ -311,7 +311,7 @@ class MailForm{
 			$mailer->Port=isset($smtp['port'])?$smtp['port']:(!empty($mailer->SMTPSecure)?465:25);
 			if(isset($smtp['sender'])){$mailer->Sender=$smtp['sender'];}
 		}
-		$mailer->CharSet="iso-2022-jp";
+		$mailer->CharSet="UTF-8";
 		$mailer->Encoding="7bit";
 		return $mailer;
 	}
@@ -327,13 +327,13 @@ class MailForm{
 		foreach((array)(isset($to)?$to:$defaultHeaders['to']) as $toAddress){
 			call_user_func_array(array($mailer,'addAddress'),self::parse_address($toAddress));
 		}
-		$mailer->Subject=mb_encode_mimeheader(isset($subject)?$subject:$defaultHeaders['subject']);
+		$mailer->Subject=isset($subject)?$subject:$defaultHeaders['subject'];
 		if(!empty($isHTML)){
 			$mailer->isHTML(true);
 			$mailer->Body=ob_get_clean();
 		}
 		else{
-			$mailer->Body=mb_convert_encoding(ob_get_clean(),'ISO-2022-JP');
+			$mailer->Body=ob_get_clean();
 		}
 		
 		if(file_exists($f=\FORM_DIR.'/mail/'.$mail.'-alt.php')){
@@ -354,6 +354,7 @@ class MailForm{
 		$this->clear();
 		$this->values=array();
 		$this->received=array();
+		$this->id=null;
 		$this->timer=array();
 	}
 	public function verify_nonce(){
@@ -378,10 +379,9 @@ class MailForm{
 	}
 	public function put_log(){
 		$this->create_log_dir_if_not_exists();
-		$id=$this->get_id();
 		$f=\LOG_DIR.'/log.csv';
 		
-		$log=array('id'=>$id,'ipAddress'=>$_SERVER["REMOTE_ADDR"],'DateTime'=>date("Y/m/d (D) H:i:s",time()));
+		$log=array('id'=>$this->get_id(),'ipAddress'=>$_SERVER["REMOTE_ADDR"],'DateTime'=>date("Y/m/d (D) H:i:s",time()));
 		foreach($this->config['inputs'] as $name=>$conf){
 			$this->inputs[$name]->reflect_to_log($log);
 		}
