@@ -367,11 +367,11 @@ class MailForm{
 	
 	public function create_log_dir_if_not_exists(){
 		if(!is_dir(\LOG_DIR)){
-			mkdir(\LOG_DIR);
+			mkdir(\LOG_DIR,0755,true);
 			util\BasicAuth::create(
 				\LOG_DIR,
-				isset($this->config['user'])?$this->config['user']:'admin',
-				isset($this->config['password'])?$this->config['password']:'password',
+				isset($this->config['log']['username'])?$this->config['log']['username']:'admin',
+				isset($this->config['log']['password'])?$this->config['log']['password']:'password',
 				"AddType application/octet-stream .csv\n"
 			);
 		}
