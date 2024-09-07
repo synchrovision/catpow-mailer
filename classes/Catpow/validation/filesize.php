@@ -10,6 +10,14 @@ class filesize extends validation{
 		}
 		return true;
 	}
+	public static function get_karma($val,$input){
+		if(isset($input->conf['filesize'])){
+			if($val['size']>static::filesize_string_to_int($input->conf['filesize'])*2){
+				return 'heavy_file_upload';
+			}
+		}
+		return 0;
+	}
 	public static function get_message_format($conf){
 		return sprintf(__('ファイルサイズは%s以下にしてください'),$conf['filesize']);
 	}
