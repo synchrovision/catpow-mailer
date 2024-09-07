@@ -15,6 +15,10 @@ class selection extends validation{
 		}
 		return false;
 	}
+	public static function get_karma($val,$input){
+		if(!self::is_valid($val,$input)){return 'danger_input';}
+		return 0;
+	}
 	public static function get_message_format($conf){
 		return __('選択項目にない値です');
 	}
