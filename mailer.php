@@ -6,11 +6,6 @@ define('MAILER_DIR',__DIR__);
 define('MAILER_URI',dirname($_SERVER['REQUEST_URI']));
 define('FORM_DIR',dirname(__DIR__));
 define('FORM_URI',dirname(MAILER_URI));
-spl_autoload_register(function($class){
-	$path=str_replace('\\','/',$class);
-	if(file_exists($f=FORM_DIR.'/classes/'.$path.'.php')){include($f);}
-	if(file_exists($f=MAILER_DIR.'/classes/'.$path.'.php')){include($f);}
-});
 global $res,$form;
 $form=Catpow\MailForm::get_instance();
 define('LOG_DIR',isset($form->config['log_dir'])?$form->config['log_dir']:FORM_DIR.'/log');
@@ -60,6 +55,7 @@ try{
 		if(!file_exists($f)){throw new Exception('Forbidden',403);}
 		include MAILER_DIR.'/functions.php';
 		include $f;
+		$form->start_timer($action,true);
 	}
 	elseif(!empty($_FILES)){
 		$form->reset_errors();
@@ -84,7 +80,6 @@ catch(Throwable $e){
 	$res['status']=$e->getCode();
 	$res['error']=array('@form'=>$e->getMessage());
 }
-$form->add_karma(1);
 $form->save_karma();
 header("Content-Type: application/json; charset=utf-8");
 echo $res;
