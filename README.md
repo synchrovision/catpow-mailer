@@ -2,7 +2,7 @@ Catpow Mailer
 ===
 
 <p align="center">
-  <img src="https://img.shields.io/badge/PHP-5.4-45A?logo=php">
+  <img src="https://img.shields.io/badge/PHP-7.2-45A?logo=php">
 </p>
 
 入力ステップの追加・分岐や、入力タイプ・入力検証の拡張の仕組みを備える、柔軟で拡張性の高い、中・上級者向けPHPのメールフォームです。
