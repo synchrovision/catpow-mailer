@@ -329,8 +329,23 @@ class MailForm{
 		}
 		$mailer->Subject=isset($subject)?$subject:$defaultHeaders['subject'];
 		if(!empty($isHTML)){
+			$cssToInlineStyles=new \voku\CssToInlineStyles\CssToInlineStyles();
+			$body=ob_get_clean();
+			$message=
+				'<!DOCTYPE html><html lang="ja">'.
+				'<head>'.
+				'<meta name="viewport" content="width=device-width" />'.
+				'<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'.
+				'<title>'.$mailer->Subject.'</title>'.
+				'</head>'.
+				'<body class="mail_body">'.$body.'</body>'.
+				'</html>';
+			$cssToInlineStyles->setHTML($message);
+			if(file_exists($f=\FORM_DIR.'/mail/css/'.$mail.'.css')){
+				$cssToInlineStyles->setCSS(file_get_contents($f));
+			}
 			$mailer->isHTML(true);
-			$mailer->Body=ob_get_clean();
+			$mailer->Body=$cssToInlineStyles->convert();
 		}
 		else{
 			$mailer->Body=ob_get_clean();
