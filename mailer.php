@@ -6,6 +6,8 @@ define('MAILER_DIR',__DIR__);
 define('MAILER_URI',dirname($_SERVER['REQUEST_URI']));
 define('FORM_DIR',dirname(__DIR__));
 define('FORM_URI',dirname(MAILER_URI));
+$dotenv=Dotenv\Dotenv::createImmutable(FORM_DIR);
+$dotenv->safeLoad();
 global $res,$form;
 $form=Catpow\MailForm::get_instance();
 define('LOG_DIR',isset($form->config['log']['dir'])?$form->config['log']['dir']:FORM_DIR.'/log');
