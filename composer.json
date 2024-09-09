@@ -13,6 +13,7 @@
 		}
 	},
 	"require": {
+		"vlucas/phpdotenv": "*",
 		"phpmailer/phpmailer": "*",
 		"voku/css-to-inline-styles": "*",
 		"pomo/pomo": "*"
