@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitc4cfb32846d8df1cf434c9ce03f21efc
+class ComposerStaticInit36534b2c42ec28205663fc40ceb5d355
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -14,21 +14,18 @@ class ComposerStaticInitc4cfb32846d8df1cf434c9ce03f21efc
     );
 
     public static $prefixLengthsPsr4 = array (
-        'v' => 
-        array (
-            'voku\\helper\\' => 12,
-            'voku\\CssToInlineStyles\\' => 23,
-        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Component\\CssSelector\\' => 30,
+            'Sabberworm\\CSS\\' => 15,
         ),
         'P' => 
         array (
             'PhpOption\\' => 10,
+            'Pelago\\Emogrifier\\' => 18,
             'POMO\\' => 5,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
@@ -49,14 +46,6 @@ class ComposerStaticInitc4cfb32846d8df1cf434c9ce03f21efc
     );
 
     public static $prefixDirsPsr4 = array (
-        'voku\\helper\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/voku/simple_html_dom/src/voku/helper',
-        ),
-        'voku\\CssToInlineStyles\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/voku/css-to-inline-styles/src',
-        ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
@@ -73,9 +62,17 @@ class ComposerStaticInitc4cfb32846d8df1cf434c9ce03f21efc
         array (
             0 => __DIR__ . '/..' . '/symfony/css-selector',
         ),
+        'Sabberworm\\CSS\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
+        ),
         'PhpOption\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
+        ),
+        'Pelago\\Emogrifier\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/pelago/emogrifier/src',
         ),
         'POMO\\' => 
         array (
@@ -703,9 +700,9 @@ class ComposerStaticInitc4cfb32846d8df1cf434c9ce03f21efc
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitc4cfb32846d8df1cf434c9ce03f21efc::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitc4cfb32846d8df1cf434c9ce03f21efc::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitc4cfb32846d8df1cf434c9ce03f21efc::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit36534b2c42ec28205663fc40ceb5d355::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit36534b2c42ec28205663fc40ceb5d355::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit36534b2c42ec28205663fc40ceb5d355::$classMap;
 
         }, null, ClassLoader::class);
     }
