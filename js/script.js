@@ -24,6 +24,7 @@ Catpow.MailForm=function(form){
 		window.scrollBy({top:bnd.top-200,behavior:'smooth'});
 	}
 	cmf.send=function(data,cb=false){
+		cmf.lock();
 		var xhr=new XMLHttpRequest();
 		xhr.responseType='text';
 		xhr.onload=function(){
@@ -59,6 +60,7 @@ Catpow.MailForm=function(form){
 				}
 				if(cb){cb(res);}
 			}
+			cmf.unlock();
 		};
 		xhr.open('POST',Catpow.MailFormUrl);
 		xhr.setRequestHeader('X-CMF-NONCE',Catpow.MailFormNonce);
@@ -72,6 +74,15 @@ Catpow.MailForm=function(form){
 	};
 	cmf.getFileUrl=function(name){
 		return Catpow.MailFormUrl+'?render='+name;
+	};
+	cmf.isLocked=false;
+	cmf.lock=function(){
+		cmf.isLocked=true;
+		form.classList.add('is-locked');
+	};
+	cmf.unlock=function(){
+		cmf.isLocked=false;
+		form.classList.remove('is-locked');
 	};
 	cmf.alert=function(text){
 		var alert=form.querySelector('.cmf-form__alert');
@@ -103,7 +114,7 @@ Catpow.MailForm=function(form){
 		Array.prototype.forEach.call(form.querySelectorAll('.cmf-button'),function(button){
 			if(button.classList.contains('sealed')){cmf.sealedButtons.push(button);}
 			button.addEventListener('click',function(){
-				if(button.classList.contains('disabled')){return;}
+				if(cmf.isLocked || button.classList.contains('disabled')){return;}
 				var fd=new FormData(form);
 				fd.append('action',button.dataset.action);
 				cmf.send(fd,cmf.focus);
