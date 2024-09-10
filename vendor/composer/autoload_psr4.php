@@ -19,5 +19,5 @@ return array(
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
     'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
-    'Catpow\\' => array($baseDir . '/../classes/Catpow', $baseDir . '/classes/Catpow'),
+    'Catpow\\' => array($baseDir . '/../classes', $baseDir . '/classes'),
 );
