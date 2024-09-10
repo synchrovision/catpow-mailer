@@ -1,6 +1,7 @@
 <?php
 namespace Catpow;
 use PHPMailer\PHPMailer\PHPMailer;
+use Pelago\Emogrifier\CssInliner;
 
 class MailForm{
 	public static
@@ -329,23 +330,31 @@ class MailForm{
 		}
 		$mailer->Subject=isset($subject)?$subject:$defaultHeaders['subject'];
 		if(!empty($isHTML)){
-			$cssToInlineStyles=new \voku\CssToInlineStyles\CssToInlineStyles();
-			$body=ob_get_clean();
-			$message=
+			$html=ob_get_clean();
+			$html=preg_replace_callback('@src=([\'"])(.+?\.(jpe?g|gif|png|webp|svg))\1@',function($matches){
+				if(strpos($matches[2],'://')!==false){return $matches[0];}
+				if(file_exists($f=($matches[2][0]==='/'?$_SERVER['DOCUMENT_ROOT']:\FORM_DIR.'/mail/').$matches[2])){
+					return 'src="data: '.mime_content_type($f).';base64,'.base64_encode(file_get_contents($f)).'"';
+				}
+				return $matches[0];
+			},$html);
+			$html=
 				'<!DOCTYPE html><html lang="ja">'.
 				'<head>'.
 				'<meta name="viewport" content="width=device-width" />'.
 				'<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'.
 				'<title>'.$mailer->Subject.'</title>'.
 				'</head>'.
-				'<body class="mail_body">'.$body.'</body>'.
+				'<body class="mail_body">'.$html.'</body>'.
 				'</html>';
-			$cssToInlineStyles->setHTML($message);
 			if(file_exists($f=\FORM_DIR.'/mail/css/'.$mail.'.css')){
-				$cssToInlineStyles->setCSS(file_get_contents($f));
+				$css=file_get_contents($f);
+			}
+			else{
+				$css=null;
 			}
 			$mailer->isHTML(true);
-			$mailer->Body=$cssToInlineStyles->convert();
+			$mailer->Body=CssInliner::fromHtml($html)->inlineCss($css)->render();
 		}
 		else{
 			$mailer->Body=ob_get_clean();
