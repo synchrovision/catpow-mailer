@@ -331,7 +331,7 @@ class MailForm{
 		$mailer->Subject=isset($subject)?$subject:$defaultHeaders['subject'];
 		if(!empty($isHTML)){
 			$html=ob_get_clean();
-			$html=preg_replace_callback('@src=([\'"])(.+?\.(jpe?g|gif|png|webp|svg))\1@',function($matches){
+			$html=preg_replace_callback('@src=([\'"])(.+?\.(jpe?g|gif|png|webp|svg))\1@i',function($matches){
 				if(strpos($matches[2],'://')!==false){return $matches[0];}
 				if(file_exists($f=($matches[2][0]==='/'?$_SERVER['DOCUMENT_ROOT']:\FORM_DIR.'/mail/').$matches[2])){
 					return 'src="data: '.mime_content_type($f).';base64,'.base64_encode(file_get_contents($f)).'"';
