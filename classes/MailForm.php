@@ -347,12 +347,9 @@ class MailForm{
 				'</head>'.
 				'<body class="mail_body">'.$html.'</body>'.
 				'</html>';
-			if(file_exists($f=\FORM_DIR.'/mail/css/'.$mail.'.css')){
-				$css=file_get_contents($f);
-			}
-			else{
-				$css=null;
-			}
+			$css='';
+			if(file_exists($f=\FORM_DIR.'/mail/css/style.css')){$css.=file_get_contents($f);}
+			if(file_exists($f=\FORM_DIR.'/mail/css/style-'.$mail.'.css')){$css.=file_get_contents($f);}
 			$mailer->isHTML(true);
 			$mailer->Body=CssInliner::fromHtml($html)->inlineCss($css)->render();
 		}
