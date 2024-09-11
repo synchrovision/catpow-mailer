@@ -29,6 +29,7 @@ Catpow.MailForm=function(form){
 		xhr.responseType='text';
 		xhr.onload=function(){
 			if(xhr.readyState===4 && xhr.status===200){
+				cmf.unlock();
 				var res;
 				try{
 					res=JSON.parse(xhr.response);
@@ -60,7 +61,6 @@ Catpow.MailForm=function(form){
 				}
 				if(cb){cb(res);}
 			}
-			cmf.unlock();
 		};
 		xhr.open('POST',Catpow.MailFormUrl);
 		xhr.setRequestHeader('X-CMF-NONCE',Catpow.MailFormNonce);
@@ -75,7 +75,6 @@ Catpow.MailForm=function(form){
 	cmf.getFileUrl=function(name){
 		return Catpow.MailFormUrl+'?render='+name;
 	};
-	cmf.isLocked=false;
 	cmf.lock=function(){
 		cmf.isLocked=true;
 		form.classList.add('is-locked');
@@ -98,6 +97,7 @@ Catpow.MailForm=function(form){
 		cmf.sealedButtons=[];
 		cmf.agreementCheckboxes=[];
 		cmf.agreed=false;
+		cmf.isLocked=false;
 		Array.prototype.forEach.call(form.querySelectorAll('.cmf-input'),function(input){
 			cmf.inputs[input.dataset.input]=new Catpow.MailFormInput(input);
 			if(input.classList.contains('cmf-agreement')){
