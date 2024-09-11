@@ -62,7 +62,8 @@ abstract class Component{
 				]];
 			}
 		}
-		$newEl=self::arrayToNode(['table',['class'=>$el->tagName],$children],$doc);
+		$level=self::getLevel($el);
+		$newEl=self::arrayToNode(['table',['class'=>$el->tagName.' is-level-'.$level,'level'=>$level],$children],$doc);
 		return $newEl;
 	}
 	public static function arrayToNode($array,$doc){
