@@ -278,7 +278,7 @@ class MailForm{
 				}
 				else{
 					$recovery=isset($this->config['karma']['recovery'])?$this->config['karma']['recovery']:1000;
-					$karma->value-=$recovery*(time()-$time)/86400;
+					$karma->value-=floor($recovery*(time()-$time)/86400);
 					if($karma->value<0){$karma->value=0;}
 					$karma->time=time();
 				}
