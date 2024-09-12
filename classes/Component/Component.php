@@ -33,36 +33,37 @@ abstract class Component{
 			'body'=>['tbody',['class'=>$el->tagName.'__tbody'],[]],
 			'footer'=>null
 		];
+		$level=self::getLevel($el);
 		foreach($el->childNodes??[] as $child){
 			if(is_a($child,\DOMText::class) && empty(trim($child->wholeText))){continue;}
 			if(is_a($child,\DOMElement::class)){
+				$rowLevel=$child->hasAttribute('level')?$child->getAttribute('level'):$level;
 				if($child->tagName==='header'){
 					$children['header']=['thead',['class'=>$el->tagName.'__thead',$child->attributes],[
-						['tr',['class'=>$el->tagName.'__thead-tr'],[
+						['tr',['class'=>$el->tagName.'__thead-tr is-level-'.$rowLevel,'level'=>$rowLevel],[
 							['th',['class'=>$el->tagName.'__thead-tr-th'],[$child->childNodes]]
 						]]
 					]];
 				}
 				elseif($child->tagName==='row'){
-					$children['body'][2][]=['tr',['class'=>$el->tagName.'__tbody-tr',$child->attributes],[
+					$children['body'][2][]=['tr',['class'=>$el->tagName.'__tbody-tr is-level-'.$rowLevel,'level'=>$rowLevel,$child->attributes],[
 						['td',['class'=>$el->tagName.'__tbody-tr-td'],[$child->childNodes]]
 					]];
 				}
 				elseif($child->tagName==='footer'){
 					$children['footer']=['tfoot',['class'=>$el->tagName.'__tfoot',$child->attributes],[
-						['tr',['class'=>$el->tagName.'__tfoot-tr'],[
+						['tr',['class'=>$el->tagName.'__tfoot-tr is-level-'.$rowLevel],[
 							['td',['class'=>$el->tagName.'__tfoot-tr-td'],[$child->childNodes]]
 						]]
 					]];
 				}
 			}
 			else{
-				$children['body'][2][]=['tr',['class'=>$el->tagName.'__tbody-tr'],[
+				$children['body'][2][]=['tr',['class'=>$el->tagName.'__tbody-tr is-level-'.$level,'level'=>$rowLevel],[
 					['td',['class'=>$el->tagName.'__tbody-tr-td'],[$child]]
 				]];
 			}
 		}
-		$level=self::getLevel($el);
 		$newEl=self::arrayToNode(['table',['class'=>$el->tagName.' is-level-'.$level,'level'=>$level],$children],$doc);
 		return $newEl;
 	}
