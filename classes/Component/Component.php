@@ -90,14 +90,17 @@ abstract class Component{
 				if(empty($child)){continue;}
 				if(is_a($child,\DOMNodeList::class)){
 					while($child->length){
-						$el->append($child->item(0));
+						$el->appendChild($child->item(0));
 					}
 				}
 				elseif(is_array($child)){
-					$el->append(self::arrayToNode($child,$doc));
+					$el->appendChild(self::arrayToNode($child,$doc));
+				}
+				elseif(is_a($child,\DOMNode::class)){
+					$el->appendChild($child);
 				}
 				else{
-					$el->append($child);
+					$el->appendChild(new \DOMText((string)$child));
 				}
 			}
 		}
