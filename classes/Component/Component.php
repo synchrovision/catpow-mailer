@@ -77,7 +77,7 @@ abstract class Component{
 							$el->setAttribute('class',$el->getAttribute('class').' '.$attr->value);
 						}
 						else{
-							$el->setAttribute($sub_key,$sub_val);
+							$el->setAttribute($attr->name,$attr->value);
 						}
 					}
 				}
