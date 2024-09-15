@@ -317,53 +317,71 @@ class MailForm{
 		return $mailer;
 	}
 	public function send($mail){
+		$data=$this->get_mail_data($mail);
+		if(empty($data)){return false;}
+		$mailer=$this->get_mailer();
+		call_user_func_array(array($mailer,'setFrom'),self::parse_address($data['from']));
+		foreach((array)($data['to']) as $toAddress){
+			call_user_func_array(array($mailer,'addAddress'),self::parse_address($toAddress));
+		}
+		$mailer->Subject=$data['subject'];
+		$mailer->Body=$data['body'];
+		if($data['isHTML']){$mailer->isHTML(true);}
+		$mailer->send();
+		$this->add_karma('send_mail');
+	}
+	public function preview($mail){
+		$data=$this->get_mail_data($mail);
+		return sprintf('<div class="cmf-preview">%s</div>',$data['body']);
+	}
+	public function get_mail_data($mail){
+		$data=[];
 		$mail=preg_replace('/\W/','',$mail);
 		if(!file_exists($f=\FORM_DIR.'/mail/'.$mail.'.php')){return false;}
 		$form=$this;
-		$mailer=$this->get_mailer();
 		ob_start();
 		include $f;
 		$defaultHeaders=$this->config['defaultHeaders'];
-		call_user_func_array(array($mailer,'setFrom'),self::parse_address(isset($from)?$from:$defaultHeaders['from']));
-		foreach((array)(isset($to)?$to:$defaultHeaders['to']) as $toAddress){
-			call_user_func_array(array($mailer,'addAddress'),self::parse_address($toAddress));
-		}
-		$mailer->Subject=isset($subject)?$subject:$defaultHeaders['subject'];
-		if(!empty($isHTML)){
-			$html=ob_get_clean();
+		$data['from']=isset($from)?$from:$defaultHeaders['from'];
+		$data['to']=isset($to)?$to:$defaultHeaders['to'];
+		$data['subject']=isset($subject)?$subject:$defaultHeaders['subject'];
+		$data['isHTML']=!empty($isHTML);
+		if($data['isHTML']){
+			$html=Component\Component::convert('<mail-body>'.ob_get_clean().'</mail-body>');
+			if(strpos($html,'<altbody>')!==false){
+				$html=preg_replace_callback('@<altbody>(.+)</altbody>@m',$html,function($matches)use($data){
+					$data['alt']=$matches[1];
+					return '';
+				});
+			}
 			$html=preg_replace_callback('@src=([\'"])(.+?\.(jpe?g|gif|png|webp|svg))\1@i',function($matches){
 				if(strpos($matches[2],'://')!==false){return $matches[0];}
-				if(file_exists($f=($matches[2][0]==='/'?$_SERVER['DOCUMENT_ROOT']:\FORM_DIR.'/mail/').$matches[2])){
-					return 'src="data: '.mime_content_type($f).';base64,'.base64_encode(file_get_contents($f)).'"';
+				if($_SERVER['SERVER_NAME']==='localhost'){
+					if(file_exists($f=($matches[2][0]==='/'?$_SERVER['DOCUMENT_ROOT']:\FORM_DIR.'/mail/').$matches[2])){
+						return 'src="data: '.mime_content_type($f).';base64,'.base64_encode(file_get_contents($f)).'"';
+					}
+					return $matches[0];
 				}
-				return $matches[0];
+				return sprintf('src="https://%s%s%s"',$_SERVER['HTTP_HOST'],($matches[2][0]==='/')?'':\FORM_URI.'/mail/',$matches[2]);
 			},$html);
 			$html=
 				'<!DOCTYPE html><html lang="ja">'.
 				'<head>'.
 				'<meta name="viewport" content="width=device-width" />'.
 				'<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'.
-				'<title>'.$mailer->Subject.'</title>'.
+				'<title>'.$data['subject'].'</title>'.
 				'</head>'.
 				'<body class="mail_body">'.$html.'</body>'.
 				'</html>';
 			$css='';
 			if(file_exists($f=\FORM_DIR.'/mail/css/style.css')){$css.=file_get_contents($f);}
 			if(file_exists($f=\FORM_DIR.'/mail/css/style-'.$mail.'.css')){$css.=file_get_contents($f);}
-			$mailer->isHTML(true);
-			$mailer->Body=CssInliner::fromHtml($html)->inlineCss($css)->render();
+			$data['body']=CssInliner::fromHtml($html)->inlineCss($css)->render();
 		}
 		else{
-			$mailer->Body=ob_get_clean();
+			$data['body']=ob_get_clean();
 		}
-		
-		if(file_exists($f=\FORM_DIR.'/mail/'.$mail.'-alt.php')){
-			ob_start();
-			include $f;
-			$mailer->AltBody=ob_get_clean();
-		}
-		$mailer->send();
-		$this->add_karma('send_mail');
+		return $data;
 	}
 	
 	public function clear(){
