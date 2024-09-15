@@ -117,7 +117,7 @@ abstract class Component{
 			}
 			return self::getLevel($el->parentNode);
 		}
-		return 1;
+		return 0;
 	}
 }
 
