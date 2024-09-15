@@ -1,16 +1,16 @@
 <?php
 namespace Catpow\Component;
 class MailList extends Component{
+	static $defaultMarker='●';
 	public static function translate($el,$doc){
 		$items=[];
-		$index=0;
+		$marker=$el->hasAttribute('marker')?$el->getAttribute('marker'):static::$defaultMarker;
 		$level=self::getLevel($el);
 		foreach($el->childNodes as $child){
 			if(!is_a($child,\DOMElement::class)){continue;}
 			if($child->tagName==='item'){
-				$index++;
 				$items[]=['tr',['class'=>$el->tagName.'-item'],[
-					['td',['class'=>$el->tagName.'-item-pref'],[(string)$index]],
+					['td',['class'=>$el->tagName.'-item-marker'],[(string)$marker]],
 					['td',['class'=>$el->tagName.'-item-content'],[$child->childNodes]]
 				]];
 			}
