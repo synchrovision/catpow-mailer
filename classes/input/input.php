@@ -15,9 +15,15 @@ abstract class input{
 		$this->form=$form;
 	}
 	public function output(){
+		if(is_array($this->value)){
+			return implode(isset($this->conf['delimiter'])?$this->conf['delimiter']:',',$this->value);
+		}
 		return $this->value;
 	}
 	public function output_as_text(){
+		if(is_array($this->value)){
+			return implode(isset($this->conf['delimiter'])?$this->conf['delimiter']:',',$this->value);
+		}
 		return $this->value;
 	}
 	public function input(){

@@ -15,7 +15,7 @@ class checkbox extends select{
 		$vals=(array)$vals;
 		$item_format=
 			'<label class="%s__item%6$s">'.
-			'<input class="%1$s__item-input" type="checkbox" name="%s" value="%s"%s>'.
+			'<input class="%1$s__item-input" type="checkbox" name="%s[]" value="%s"%s>'.
 			'<span class="%1$s__item-text" for="%1$s">%s</label>'.
 			'</label>';
 		foreach((array)$sels as $i=>$s){
