@@ -33,36 +33,38 @@ abstract class Component{
 			'body'=>['tbody',['class'=>$el->tagName.'__tbody'],[]],
 			'footer'=>null
 		];
+		$level=self::getLevel($el);
 		foreach($el->childNodes??[] as $child){
 			if(is_a($child,\DOMText::class) && empty(trim($child->wholeText))){continue;}
 			if(is_a($child,\DOMElement::class)){
+				$rowLevel=$child->hasAttribute('level')?$child->getAttribute('level'):$level;
 				if($child->tagName==='header'){
 					$children['header']=['thead',['class'=>$el->tagName.'__thead',$child->attributes],[
-						['tr',['class'=>$el->tagName.'__thead-tr'],[
-							['th',['class'=>$el->tagName.'__thead-tr-th'],[$child->childNodes]]
+						['tr',['class'=>$el->tagName.'-header is-level-'.$rowLevel,'level'=>$rowLevel],[
+							['th',['class'=>$el->tagName.'-header__th'],[$child->childNodes]]
 						]]
 					]];
 				}
 				elseif($child->tagName==='row'){
-					$children['body'][2][]=['tr',['class'=>$el->tagName.'__tbody-tr',$child->attributes],[
-						['td',['class'=>$el->tagName.'__tbody-tr-td'],[$child->childNodes]]
+					$children['body'][2][]=['tr',['class'=>$el->tagName.'-row is-level-'.$rowLevel,'level'=>$rowLevel,$child->attributes],[
+						['td',['class'=>$el->tagName.'-row__td'],[$child->childNodes]]
 					]];
 				}
 				elseif($child->tagName==='footer'){
 					$children['footer']=['tfoot',['class'=>$el->tagName.'__tfoot',$child->attributes],[
-						['tr',['class'=>$el->tagName.'__tfoot-tr'],[
-							['td',['class'=>$el->tagName.'__tfoot-tr-td'],[$child->childNodes]]
+						['tr',['class'=>$el->tagName.'-footer is-level-'.$rowLevel],[
+							['td',['class'=>$el->tagName.'-footer__td'],[$child->childNodes]]
 						]]
 					]];
 				}
 			}
 			else{
-				$children['body'][2][]=['tr',['class'=>$el->tagName.'__tbody-tr'],[
-					['td',['class'=>$el->tagName.'__tbody-tr-td'],[$child]]
+				$children['body'][2][]=['tr',['class'=>$el->tagName.'-row is-level-'.$level,'level'=>$rowLevel],[
+					['td',['class'=>$el->tagName.'-row__td'],[$child]]
 				]];
 			}
 		}
-		$newEl=self::arrayToNode(['table',['class'=>$el->tagName],$children],$doc);
+		$newEl=self::arrayToNode(['table',['class'=>$el->tagName.' is-level-'.$level,'level'=>$level],$children],$doc);
 		return $newEl;
 	}
 	public static function arrayToNode($array,$doc){
@@ -75,7 +77,7 @@ abstract class Component{
 							$el->setAttribute('class',$el->getAttribute('class').' '.$attr->value);
 						}
 						else{
-							$el->setAttribute($sub_key,$sub_val);
+							$el->setAttribute($attr->name,$attr->value);
 						}
 					}
 				}
@@ -89,14 +91,17 @@ abstract class Component{
 				if(empty($child)){continue;}
 				if(is_a($child,\DOMNodeList::class)){
 					while($child->length){
-						$el->append($child->item(0));
+						$el->appendChild($child->item(0));
 					}
 				}
 				elseif(is_array($child)){
-					$el->append(self::arrayToNode($child,$doc));
+					$el->appendChild(self::arrayToNode($child,$doc));
+				}
+				elseif(is_a($child,\DOMNode::class)){
+					$el->appendChild($child);
 				}
 				else{
-					$el->append($child);
+					$el->appendChild(new \DOMText((string)$child));
 				}
 			}
 		}
@@ -112,7 +117,7 @@ abstract class Component{
 			}
 			return self::getLevel($el->parentNode);
 		}
-		return 1;
+		return 0;
 	}
 }
 
