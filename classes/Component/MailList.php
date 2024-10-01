@@ -9,7 +9,7 @@ class MailList extends Component{
 		foreach($el->childNodes as $child){
 			if(!is_a($child,\DOMElement::class)){continue;}
 			if($child->tagName==='item'){
-				$items[]=['tr',['class'=>$el->tagName.'-item'],[
+				$items[]=['tr',['class'=>$el->tagName.'-item is-level-'.$level],[
 					['td',['class'=>$el->tagName.'-item-marker'],[(string)$marker]],
 					['td',['class'=>$el->tagName.'-item-content'],[$child->childNodes]]
 				]];

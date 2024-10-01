@@ -15,7 +15,7 @@ class MailMediatext extends Component{
 		}
 		return self::arrayToNode(['table',['class'=>$el->tagName.' is-level-'.$level],[
 			['tbody',['class'=>$el->tagName.'__tbody'],[
-				['tr',['class'=>$el->tagName.'-item'],$children]
+				['tr',['class'=>$el->tagName.'-item is-level-'.$level],$children]
 			]]
 		]],$doc);
 	}
