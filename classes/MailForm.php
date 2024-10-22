@@ -20,7 +20,7 @@ class MailForm{
 			)
 		);
 	private $id=null,$timer=array();
-	public $nonce,$created,$expire,$inputs=array(),$allowed_actions=array(),$allowed_inputs=array(),$agreements=array(),$config,$values=array(),$received=array(),$errors=array();
+	public $nonce,$created,$expire,$referer,$inputs=array(),$allowed_actions=array(),$allowed_inputs=array(),$agreements=array(),$config,$values=array(),$received=array(),$errors=array();
 	public function __construct(){
 		include \FORM_DIR.'/config.php';
 		$this->config=$config;
@@ -510,6 +510,7 @@ class MailForm{
 	}
 	
 	public function render_nonce_register_script(){
+		$this->referer=$_SERVER['HTTP_REFERER'];
 		printf("\nCatpow.MailFormNonce=\"%s\";\n",$this->nonce);
 	}
 	public function render_ui_register_script(){
