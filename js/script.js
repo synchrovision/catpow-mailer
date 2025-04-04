@@ -146,7 +146,7 @@ Catpow.MailForm.loadScript=function(src,cb){
 	el.setAttribute('type','text/javascript');
 	el.setAttribute('src',src);
 	document.body.appendChild(el);
-	if(cb){el.onload=cb;}
+	if(cb){el.onload=el.onerror=cb;}
 }
 Catpow.MailForm.loadStyle=function(href){
 	var el=document.createElement('link');
