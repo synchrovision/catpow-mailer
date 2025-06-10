@@ -1,60 +1,98 @@
-﻿import {bem,dataSizeStringToInt,intToDataSizeString} from 'util';
-import {Portal} from 'component';
+﻿import { bem, dataSizeStringToInt, intToDataSizeString } from "catpow/util";
+import { Portal } from "catpow/component";
 
-Catpow.UI.UploadMedia=(props)=>{
-	const {useCallback,useState,useMemo,useRef,useEffect}=React;
-	const {createPortal}=ReactDOM;
-	const {className="cmf-ui-uploadmedia",text='Select File',cmf}=props;
-	const {HiddenValues}=Catpow.Components;
-	const classes=bem(className);
-	
-	const [file,setFile]=useState(false);
-	const [previewUrl,setPreviewUrl]=useState(false);
-	const [message,setMessage]=useState(false);
-	const [root,setRoot]=useState(false);
-	const [portalForm,setPortalForm]=useState(false);
-	const [fileInput,setFileInput]=useState(false);
-	
-	const maxFileSizeInt=useMemo(()=>{
-		if(!props.filesize){return false;}
+const matchesAccept = (file, accept) => {
+	const acceptList = accept
+		.split(",")
+		.map((s) => s.trim())
+		.filter(Boolean);
+	const mime = file.type;
+	const name = file.name;
+
+	return acceptList.some((pattern) => {
+		if (pattern.startsWith(".")) {
+			return name.toLowerCase().endsWith(pattern.toLowerCase());
+		} else if (pattern.endsWith("/*")) {
+			const typePrefix = pattern.slice(0, -1);
+			return mime.startsWith(typePrefix);
+		} else {
+			return mime === pattern;
+		}
+	});
+};
+Catpow.UI.UploadMedia = (props) => {
+	const { useState, useMemo, useCallback, useEffect } = React;
+	const { className = "cmf-ui-uploadmedia", text = "Select File", cmf } = props;
+	const { HiddenValues } = Catpow.Components;
+	const classes = bem(className);
+
+	const [file, setFile] = useState(false);
+	const [message, setMessage] = useState(false);
+	const [fileInput, setFileInput] = useState(false);
+
+	const maxFileSizeInt = useMemo(() => {
+		if (!props.filesize) {
+			return false;
+		}
 		return dataSizeStringToInt(props.filesize);
-	},[props.filesize]);
-	
-	useEffect(()=>{
-		if(!fileInput){return;}
-		fileInput.addEventListener('change',(e)=>{
-			const files=e.currentTarget.files;
-			for(let i=0;i<files.length;i++){
-				if(files[i].size>maxFileSizeInt){
-					setMessage('Too large File');
-					setPreviewUrl(false);
+	}, [props.filesize]);
+
+	const updateFile = useCallback(
+		(files) => {
+			for (let i = 0; i < files.length; i++) {
+				if (files[i].size > maxFileSizeInt) {
+					setMessage("Too large File");
+					return;
+				}
+				if (!matchesAccept(files[i], props.accept)) {
+					setMessage("Invalid File type");
 					return;
 				}
 			}
 			setMessage(false);
-			const data=new FormData(portalForm);
-			cmf.send(data,function(res){
-				if(res.error){
+			const data = new FormData();
+			data.set(props.name, files[0]);
+			cmf.send(data, function (res) {
+				if (res.error) {
 					cmf.showError(res.error);
 					cmf.focusAlert();
 					return;
 				}
-				if(res.files && res.files[props.name]){
+				if (res.files && res.files[props.name]) {
 					setFile(res.files[props.name]);
-					root.dispatchEvent(e);
 				}
 			});
-		});
-	},[root,portalForm,fileInput]);
+		},
+		[setMessage, setFile]
+	);
+	const onDropHandler = useCallback(
+		(e) => {
+			e.preventDefault();
+			if (e.dataTransfer.items) {
+				updateFile([...e.dataTransfer.items].filter((item) => item.kind === "file").map((item) => item.getAsFile()));
+			} else {
+				updateFile(e.dataTransfer.files);
+			}
+		},
+		[updateFile]
+	);
+	const onFileInputChangeHandler = useCallback(
+		(e) => {
+			updateFile(e.currentTarget.files);
+		},
+		[updateFile]
+	);
 
 	return (
-		<div className={classes()} ref={setRoot}>
-			<div className={classes.button()} onClick={()=>fileInput.click()}>{text}</div>
+		<div className={classes()} onDrop={onDropHandler} onDragOver={(e) => e.preventDefault()}>
+			<div className={classes.button()} onClick={() => fileInput.click()}>
+				{text}
+			</div>
 			{message && <div className={classes.message()}>{message}</div>}
 			{file && (
 				<div className={classes.preview()} key={file.name}>
 					<div className={classes.preview.images()}>
-						<img className={classes.preview.images.img()} src={cmf.getFileUrl(props.name)}/>
+						<img className={classes.preview.images.img()} src={cmf.getFileUrl(props.name) + "&fname=" + file.file_name} />
 					</div>
 					<div className={classes.preview.spec()}>
 						<span className={classes.preview.spec.name()}>{file.name}</span>
@@ -63,16 +101,11 @@ Catpow.UI.UploadMedia=(props)=>{
 				</div>
 			)}
 			<Portal className={classes.portal()}>
-				<form className={classes.portal.form()} ref={setPortalForm}>
-					<input className={classes.portal.input()} type="file" name={props.name} accept={props.accept} ref={setFileInput}/>
+				<form className={classes.portal.form()}>
+					<input className={classes.portal.input()} type="file" name={props.name} accept={props.accept} onChange={onFileInputChangeHandler} ref={setFileInput} />
 				</form>
 			</Portal>
-			{file && (
-				<HiddenValues
-					name={props.name}
-					value={file}
-				/>
-			)}
+			{file && <HiddenValues name={props.name} value={file} />}
 		</div>
 	);
-}
+};
