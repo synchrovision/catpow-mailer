@@ -22,11 +22,12 @@ const matchesAccept = (file, accept) => {
 };
 Catpow.UI.UploadMedia = (props) => {
 	const { useState, useMemo, useCallback, useEffect } = React;
-	const { className = "cmf-ui-uploadmedia", text = "Select File", cmf } = props;
+	const { className = "cmf-ui-uploadmedia", text = "Select File", cmf, loaderDots = 5 } = props;
 	const { HiddenValues } = Catpow.Components;
 	const classes = bem(className);
 
 	const [file, setFile] = useState(false);
+	const [isUploading, setIsUploading] = useState(false);
 	const [message, setMessage] = useState(false);
 	const [fileInput, setFileInput] = useState(false);
 
@@ -50,9 +51,11 @@ Catpow.UI.UploadMedia = (props) => {
 				}
 			}
 			setMessage(false);
+			setIsUploading(true);
 			const data = new FormData();
 			data.set(props.name, files[0]);
 			cmf.send(data, function (res) {
+				setIsUploading(false);
 				if (res.error) {
 					cmf.showError(res.error);
 					cmf.focusAlert();
@@ -84,9 +87,16 @@ Catpow.UI.UploadMedia = (props) => {
 	);
 
 	return (
-		<div className={classes()} onDrop={onDropHandler} onDragOver={(e) => e.preventDefault()}>
+		<div className={classes({ "is-uploading": isUploading })} onDrop={onDropHandler} onDragOver={(e) => e.preventDefault()}>
 			<div className={classes.button()} onClick={() => fileInput.click()}>
 				{text}
+				{isUploading && (
+					<div className={classes.loader()}>
+						{[...Array(loaderDots).keys()].map((i) => (
+							<div className={classes.loader._dot("is-dot-" + i)} style={{ "--dot-index": i }} key={i}></div>
+						))}
+					</div>
+				)}
 			</div>
 			{message && <div className={classes.message()}>{message}</div>}
 			{file && (
